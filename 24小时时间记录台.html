@@ -177,7 +177,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .undobar button{color:#fff;background:rgba(255,255,255,.2);border-radius:18px;padding:6px 16px;font-size:13px;font-weight:600;white-space:nowrap}
 .undobar button:active{background:rgba(255,255,255,.34)}
 /* ===== 胶囊时间轴（整点小时块，无刻度线，同块多段渐变）===== */
-.daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(9,1fr);gap:7px 6px}
+.daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:7px 6px}
 .hblock{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:60px;cursor:pointer;transition:box-shadow .15s}
 .hblock.night{background:var(--empn)}
 .hblock.nowcap{box-shadow:0 0 0 2.5px var(--tx2)}
@@ -250,7 +250,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .tplchip{padding:7px 13px;border:1px solid var(--line2);background:#fff;border-radius:18px;font-size:13px;font-weight:500;color:var(--tx2);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.12s}
 .tplchip:active{transform:scale(.97)}
 .tplchip.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.tplgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:7px 6px;margin-top:12px;max-width:880px;margin-left:auto;margin-right:auto}
+.tplgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px 6px;margin-top:12px;max-width:880px;margin-left:auto;margin-right:auto}
 .tplgrid .hblock{min-height:96px}
 .tplgrid .hbody{flex:1;display:flex;flex-direction:column;min-height:0}
 .tplgrid .hslot{flex:1;position:relative;cursor:pointer;background:var(--empn)}
@@ -259,7 +259,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .tplgrid .hslot .tlab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;padding:0 3px;text-align:center;line-height:1.15;pointer-events:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .tplgrid .hslot.plan .hfill{box-sizing:border-box}
 @media(max-width:768px){
-.tplgrid{grid-template-columns:repeat(6,1fr);gap:6px 5px}
+.tplgrid{grid-template-columns:repeat(8,1fr);gap:6px 5px}
 .tplgrid .hblock{min-height:86px}
 .tplgrid .hslot .tlab{font-size:10px}
 }
@@ -344,7 +344,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .recbar .hd-right .btn.rec{flex:1}
 .hd-big{font-size:20px}
 .dpwrap,.wkwrap,.daygrid,.tplgrid{max-width:100%;margin-left:0;margin-right:0}
-.daygrid{grid-template-columns:repeat(6,1fr);gap:6px 5px}
+.daygrid{grid-template-columns:repeat(8,1fr);gap:6px 5px}
 .hblock{min-height:56px;border-radius:12px}
 .hhour{font-size:11px}
 .kpis{grid-template-columns:repeat(2,1fr)}
@@ -497,10 +497,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <button class="moodchip" id="moodChip" onclick="editMood()"><span class="mf mut3">记今天心情</span></button>
     <button class="btn sm grumble" onclick="openGrumble()">💢 发牢骚</button>
   </div>
-  <div class="qbar" id="qbar" style="display:none">
-    <div class="qhint" id="qHint"></div>
-    <div class="qchips" id="qChips"></div>
-  </div>
   <!-- ===== 饮食 / 运动 / 自律 打卡 ===== -->
   <div class="habitwrap">
     <div class="zilvbar" id="zilvBadge"></div>
@@ -584,8 +580,8 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
   <div class="wkwrap" id="p-week" style="margin-top:16px">
     <div class="dphead">
       <div class="hd-left">
-        <div class="hd-big">最近一周<span class="hd-week" id="wkRange"></span></div>
-        <div class="hd-sub"><span class="tag">周视图</span><span class="mut3">7 条竖轴＝最近 7 天（含今天），颜色即分类</span></div>
+        <div class="hd-big">周详情<span class="hd-week" id="wkRange"></span></div>
+        <div class="hd-sub"><span class="tag">周详情</span><span class="mut3">7 条竖轴＝最近 7 天（含今天），颜色即分类</span></div>
       </div>
     </div>
     <div class="wklegend" id="wkLegend"></div>
@@ -725,7 +721,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
       2. <b>点任意胶囊</b>：弹窗里能看本小时已填的段，并手动填开始/结束的「几点几分」（默认整点，分钟你自己改）。分类一键选<br>
       3. 一个胶囊可填多段（如 14:00–14:20 工作、14:20–14:30 学习），各段按自己的时间位置各占一截<br>
       4. 吃饭 / 日常选「吃饭 / 日常」分类——看得见，但不算进 学习/工作/娱乐/运动/社交 五类占比<br>
-      5. <b>接着记</b>：点下方分类（或「记现在」），自动从上一活动结束续到当前<br>
+      5. <b>记现在</b>：顶部按钮，自动按上一次用的分类从上次结束续到当前；想换分类就点时间胶囊手动选<br>
       6. 昨天默认能补；手机上：浏览器打开 → 分享 → 添加到主屏幕<br>
       7. <b>云同步</b>：设置里填一次 GitHub 令牌，点「☁️ 同步到云端」上传；换设备填同一个令牌、点一次同步即可拉取共用
     </div>
@@ -1157,7 +1153,6 @@ function firstFreeStart(d,hour){
 function renderRec(){
   applyDayLight();
   renderTimeline();
-  renderQbar();
   renderMood();
   renderGrumble();
   renderSum();
@@ -1232,10 +1227,10 @@ function mergeParts(parts){
 }
 function renderTimeline(){
   var el=document.getElementById('timeline');
-  var t=todayStr();
-  var startD=addD(t,-1), startH=21;
-  var endD=addD(t,1), endH=9;
-  var totalH=diffD(endD,startD)*24 - startH + endH;   /* 36 小时 */
+  var t=curDate;       /* 跟 dayTabs 切换（不再固定今天） */
+  var startD=t, startH=0;
+  var endD=t, endH=24;
+  var totalH=24;       /* 每天一个独立的 24 小时窗口（0:00–24:00），不再跨夜滚动 */
   var baseMs=pd(startD).setHours(startH,0,0,0);
   var nm=minNow();
   var h='';
@@ -1245,7 +1240,7 @@ function renderTimeline(){
     var night=(hh>=22||hh<=5);
     var base=hh*60;
     var parts=mergeParts(evOverlap(d,base,base+60));
-    var isNowCap=(d===t && hh===Math.floor(nm/60));
+    var isNowCap=(t===todayStr() && d===t && hh===Math.floor(nm/60));
     var plans=planOverlap(d,base,base+60);
     var plh='';
     plans.forEach(function(p){
@@ -1326,22 +1321,6 @@ function renderSum(){
   h+='<span class="sumit"><i style="background:'+catColor('E')+'"></i>'+EAT.n+' <b>'+hrs(c['E'])+'</b></span>';
   h+='<span class="sumit"><i style="background:var(--line2)"></i>未记录 <b>'+hrs(1440-tot-life)+'</b></span>';
   document.getElementById('sumbar').innerHTML=h;
-}
-function renderQbar(){
-  var d=curDate, last=lastEventEnd(d), isT=(d===todayStr());
-  var start=last, end=isT?minNow():1440;
-  var hint, long=false;
-  if(last<=0) hint='这一天还没开始记，点一个分类即可从 <b>00:00</b> 接着记到'+(isT?'<b>现在</b>':'<b>24:00</b>');
-  else if(start>=end){ hint='已记到'+(isT?'<b>现在</b>':'<b>24:00</b>')+'，可以点胶囊补细节，或等下一格再记'; long=true; }
-  else hint='上一段止于 <b>'+fmtHM(last)+'</b>，接着记：从 <b>'+fmtHM(start)+'</b> 到'+(isT?'<b>现在</b>':'<b>24:00</b>');
-  var chips='';
-  CATS.concat([DAILY,EAT]).forEach(function(c){
-    chips+='<button class="qc'+(S.cfg.lastCat===c.k?' wr':'')+'" onclick="quickContinue(\''+c.k+'\')"><i style="background:'+catColor(c.k)+'"></i>'+esc(c.n)+'</button>';
-  });
-  document.getElementById('qHint').innerHTML=hint;
-  document.getElementById('qHint').classList.toggle('long',long);
-  document.getElementById('qChips').innerHTML=chips;
-  document.getElementById('qbar').style.display='block';
 }
 function txtOn(hex){
   if(!hex||hex[0]!=='#')return '#15181D';
@@ -1726,7 +1705,9 @@ function renderStat(){
   h+='<div style="margin-top:16px">'+catBars(st.c,st.tot)+'</div>';
   h+=weatherReview(r.ds)+moodReview(r.ds);
   if(sv==='year'&&st.rec<90)h+='<div class="hint">已记录 '+st.rec+' 天，再有约 '+(90-st.rec)+' 天，年度规律才会真正显现。</div>';
-  document.getElementById('statBody').innerHTML=h;renderDerive();renderGoals();
+  document.getElementById('statBody').innerHTML=h;
+  var wk=document.getElementById('p-week'); if(wk)wk.style.display=(sv==='week')?'':'none';
+  renderDerive();renderGoals();
 }
 function dayWeather(d){var w=wxOf(d);if(!w)return '';
   return '<div class="wxstat">'+wxEmoji(w)+'<span>'+esc(w)+'</span></div>';}
@@ -2118,7 +2099,7 @@ function storeInfo(){
 }
 
 /* ===== 作息模板 / 目标 / 提醒 ===== */
-var TPL_SLOTS=72;
+var TPL_SLOTS=48;   /* 模板只规划当天 24 小时（48 个半小时槽），与时间轴同步 */
 var DEFROUTINE=[
  {a:20,e:21,k:'4',t:'走路'},
  {a:21,e:23,k:'D',t:'洗漱早餐'},
@@ -2161,15 +2142,14 @@ function ensureCfg(){
 function getTpl(){return S.cfg.templates[S.cfg.curTpl];}
 function segAt(segs,s){for(var i=0;i<segs.length;i++){if(s>=segs[i].a&&s<segs[i].e)return segs[i];}return null;}
 function tplSlotInfo(s){
-  var baseH=21, h=((baseH*2+s)%48)/2;
-  var dayIdx=Math.floor((baseH*2+s)/48);
-  var dayLabel=['昨天','今天','明天'][dayIdx]||'';
-  var slotInDay=(baseH*2+s)%48;
+  var baseH=0, h=(s%48)/2;          /* 模板只规划当天 0:00-24:00 */
+  var dayIdx=0, dayLabel='今天';
+  var slotInDay=s%48;
   return {h:Math.floor(h),dayIdx:dayIdx,dayLabel:dayLabel,slotInDay:slotInDay};
 }
 function tplSlotLab(s){
   var info=tplSlotInfo(s), hh=info.h, mm=(s%2)*30;
-  return info.dayLabel+' '+pad(hh)+':'+pad(mm);
+  return pad(hh)+':'+pad(mm);
 }
 function tplRangeLab(a,b){
   return tplSlotLab(a)+' – '+tplSlotLab(b).replace(/^(昨天|今天|明天) /,'');
@@ -2190,8 +2170,12 @@ function renderTplChips(){
 function switchTpl(i){S.cfg.curTpl=i;save();renderTplEditor();}
 function tplRename(v){var tp=getTpl();tp.name=v;save();renderTplChips();renderTplPick();}
 function newTemplate(){
-  S.cfg.templates.push({name:'新模板 '+(S.cfg.templates.length+1),segs:[]});
-  S.cfg.curTpl=S.cfg.templates.length-1;save();renderTplEditor();toast('已新建模板，开始规划吧');
+  /* 默认按今天饮食方案预填 3 餐（与记录页早/中/晚同步） */
+  ensureHabitCfg();
+  var w=wdKey(todayStr()), pl=S.cfg.diet[w]||[];
+  var segs=pl.map(function(m){return {a:Math.floor(m.time/30),e:Math.floor((m.time+(m.dur||MEAL_DUR))/30),k:'E',t:m.name};});
+  S.cfg.templates.push({name:'新模板 '+(S.cfg.templates.length+1),segs:segs});
+  S.cfg.curTpl=S.cfg.templates.length-1;save();renderTplEditor();toast('已按今天饮食方案预填 '+(segs.length||0)+' 段');
 }
 function delTemplate(){
   if(S.cfg.templates.length<=1){toast('至少保留一个模板');return;}
@@ -2202,7 +2186,7 @@ function delTemplate(){
 function resetTplDay(){var tp=getTpl();tp.segs=[];save();renderTplTimeline();toast('本模板已清空，从头规划');}
 function renderTplTimeline(){
   var tp=getTpl(), segs=tp.segs||[], el=document.getElementById('tplTimeline'), h='';
-  for(var k=0;k<36;k++){
+  for(var k=0;k<24;k++){
     var s=k*2, info=tplSlotInfo(s), hh=info.h, isDayStart=(hh===0);
     h+='<div class="hblock'+(isDayStart?' daystart':'')+'">';
     h+='<div class="hhour">'+(hh<10?'0'+hh:hh)+':00</div>';
@@ -2648,19 +2632,10 @@ function renderMealCard(){
 }
 
 var _mealDate=null;
-function openMeal(){_mealDate=curDate;renderMealTabs();renderMealDay();document.getElementById('mealMask').classList.add('on');}
+function openMeal(){_mealDate=curDate;renderMealDay();document.getElementById('mealMask').classList.add('on');}
 function closeMeal(){var m=document.getElementById('mealMask');if(m)m.classList.remove('on');}
-function pickMealDate(d){_mealDate=d;renderMealTabs();renderMealDay();}
+function pickMealDate(d){_mealDate=d;renderMealDay();}
 
-function renderMealTabs(){
-  var el=document.getElementById('mealTabs'); if(!el)return;
-  var ds=weekDates(curDate), t=todayStr(), h='';
-  ds.forEach(function(d,i){
-    h+='<button class="wdtab'+(d===_mealDate?' on':'')+(d===t?' today':'')+'" onclick="pickMealDate(\''+d+'\')">'+
-       '周'+'一二三四五六日'[i]+'<i>'+(+d.slice(8))+'</i></button>';
-  });
-  el.innerHTML=h;
-}
 function renderMealDay(){
   var d=_mealDate||curDate, pl=mealPlan(d), m=habRead(d).meal, st=mealStat(d), lock=!dayEditable(d);
   var sub=document.getElementById('mealSheetSub');
@@ -2705,7 +2680,7 @@ function renderWorkoutCard(){
   document.getElementById('woProg').textContent=st.done+'/'+st.total+' 项';
   document.getElementById('woBar').style.width=(st.total?Math.round(st.done/st.total*100):0)+'%';
   document.getElementById('woNext').textContent=
-    !st.total?'这天没有运动项':(miss.length?('还差 '+miss.join(' / ')):'今天全打完了');
+    !st.total?'这天没有运动项':(miss.length?('还差 '+miss.join(' / ')):'今天运动目标完成');
 }
 function openWorkout(){renderWorkoutSheet();document.getElementById('workoutMask').classList.add('on');}
 function closeWorkout(){var m=document.getElementById('workoutMask');if(m)m.classList.remove('on');}
@@ -3011,7 +2986,7 @@ document.getElementById('wxSw').classList.toggle('on',S.cfg.autoWx!==false);
 document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);
 document.getElementById('todayModal').onclick=function(e){if(e.target===this)closeToday()};
 renderRec();renderToday();renderIdeas();renderCatMgr();storeInfo();refreshCloudStat();renderTplEditor();renderGoalList();renderGoals();checkReminders();setSV('day');
-setInterval(function(){if(curDate===todayStr()){renderTimeline();renderDayPlan();renderQbar();renderToday();checkReminders();
+setInterval(function(){if(curDate===todayStr()){renderTimeline();renderDayPlan();renderToday();checkReminders();
   var wp=document.getElementById('p-stat');if(wp&&wp.classList.contains('on'))renderWeek();}},60000);
 </script>
 </body>
