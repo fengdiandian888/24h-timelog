@@ -1161,17 +1161,27 @@ function syncHabitEvents(d){
   var m=dd.meal||{}, wo=dd.workout||{}, tags={}, evs=dd.ev||[], changed=false;
   evs.forEach(function(e){ if(e.hab)tags[e.hab]=1; });
   function push(ev){ evs.push(ev); tags[ev.hab]=1; changed=true; }
+  function upd(tag,s,e,t){ /* 事件已存在但时间/备注与配置不符 → 修正（保证改配置时间后事件同步） */
+    var ev=evs.filter(function(x){return x.hab===tag;})[0];
+    if(!ev)return false;
+    if(ev.s!==s||ev.e!==e||ev.t!==t){ev.s=s;ev.e=e;ev.t=t;changed=true;}
+    return true;
+  }
   mealPlan(d).forEach(function(x){
-    if(m[x.id]&&m[x.id].done&&!tags['meal:'+x.id])push({id:uid(),gid:uid(),hab:'meal:'+x.id,cat:'E',s:x.time,e:x.time+(x.dur||MEAL_DUR),t:x.name,plan:false});
+    if(!(m[x.id]&&m[x.id].done))return;
+    var s=x.time, e=s+(x.dur||MEAL_DUR);
+    if(!upd('meal:'+x.id,s,e,x.name))push({id:uid(),gid:uid(),hab:'meal:'+x.id,cat:'E',s:s,e:e,t:x.name,plan:false});
   });
-  if(wo.train&&wo.train.done&&!tags.train){
+  if(wo.train&&wo.train.done){
     var ts=(wo.train.s==null?S.cfg.workout.trainStart:wo.train.s), te=(wo.train.e==null?S.cfg.workout.trainEnd:wo.train.e);
     if(te<=ts)te=ts+60;
-    push({id:uid(),gid:uid(),hab:'train',cat:'4',s:ts,e:te,t:trainName(d),plan:false});
+    if(!upd('train',ts,te,trainName(d)))push({id:uid(),gid:uid(),hab:'train',cat:'4',s:ts,e:te,t:trainName(d),plan:false});
   }
-  (S.cfg.workout.walks||[]).forEach(function(min,i){
-    var k=String(min);
-    if(wo.walk&&wo.walk[k]&&wo.walk[k].done&&!tags['walk:'+k])push({id:uid(),gid:uid(),hab:'walk:'+k,cat:'4',s:min,e:min+WALK_DUR,t:(WALK_LB[i]||('步行'+(i+1))),plan:false});
+  (S.cfg.workout.walks||[]).forEach(function(m,i){
+    var r=walkRange(m), k=String(r.s), tag='walk:'+k;
+    if(!(wo.walk&&wo.walk[k]&&wo.walk[k].done))return;
+    var t=(WALK_LB[i]||('步行'+(i+1)));
+    if(!upd(tag,r.s,r.e,t))push({id:uid(),gid:uid(),hab:tag,cat:'4',s:r.s,e:r.e,t:t,plan:false});
   });
   var out=evs.filter(function(e){
     if(!e.hab)return true;
@@ -2567,6 +2577,11 @@ function weekOpenDay(d){
 /* ==================== 饮食 / 运动 / 自律 —— 数据模型 ==================== */
 var HB_MEAL='#E8943A';   /* 吃饭标记色 = 吃饭分类色 #E8943A */
 var MEAL_DUR=30, WALK_DUR=25, COMM_DUR=25;  /* 勾选打卡即生成记录段的默认时长(分钟)：吃饭/步行/通勤 */
+/* 步行时间配置：兼容「数字=单点开始」旧格式与「{s,e}=起止」新格式；结束缺省回落到 s+WALK_DUR */
+function walkRange(x){
+  if(x&&typeof x==='object'&&x.s!=null)return {s:x.s,e:(x.e!=null?x.e:x.s+WALK_DUR)};
+  return {s:x,e:x+WALK_DUR};
+}
 var HB_SPORT='#71BF50';  /* 运动标记色（= 运动分类色） */
 var HB_SPORT_BAR='#71BF50'; /* 进度条（运动卡用，= HB_SPORT 运动时间轴标记同源色，与饮食绿有意区分） */
 var HB_OK='#1FA971';     /* 自律达标绿 */
@@ -2701,7 +2716,7 @@ function ensureHabitDay(d){
   if(!w.train.done){w.train.s=cfg.trainStart;w.train.e=cfg.trainEnd;} /* 未打卡的天跟随设置变化 */
   if(!w.walk||typeof w.walk!=='object')w.walk={};
   if(!w.commute||typeof w.commute!=='object')w.commute={};
-  cfg.walks.forEach(function(m){var k=String(m);if(!w.walk[k])w.walk[k]={done:false};});
+  cfg.walks.forEach(function(m){var k=String(walkRange(m).s);if(!w.walk[k])w.walk[k]={done:false};});
   cfg.commute.forEach(function(m){var k=String(m);if(!w.commute[k])w.commute[k]={done:false};});
   return dd;
 }
@@ -2747,8 +2762,8 @@ function woItems(d){
     a.push({type:'train',label:'训练 · '+tn,short:'训练',s:ts,e:te,done:!!t.done,zilv:true});
   }
   cfg.walks.forEach(function(m,i){
-    var k=String(m), r=(wo.walk&&wo.walk[k])||{};
-    a.push({type:'walk',min:m,key:k,label:(WALK_LB[i]||('步行'+(i+1))),short:'步行',done:!!r.done,zilv:true});
+    var r=walkRange(m), k=String(r.s);
+    a.push({type:'walk',min:r.s,e:r.e,key:k,label:(WALK_LB[i]||('步行'+(i+1))),short:'步行',done:!!((wo.walk&&wo.walk[k])||{}).done,zilv:true});
   });
   cfg.commute.forEach(function(m,i){
     var k=String(m), r=(wo.commute&&wo.commute[k])||{};
@@ -2870,7 +2885,7 @@ function renderWorkoutSheet(){
   a.filter(function(x){return x.type==='walk';}).forEach(function(x){
     h+='<button class="wobtn'+(x.done?' on':'')+'" onclick="toggleWalk(\''+d+'\','+x.min+')">'+
        '<span class="mbtick">'+(x.done?'✓':'')+'</span><b>'+esc(x.label)+'</b>'+
-       '<span class="wot">'+fmtHM(x.min)+'</span></button>';
+       '<span class="wot">'+fmtHM(x.min)+' – '+fmtHM(x.e)+'</span></button>';
   });
   h+='</div>';
   /* ③ 通勤：去程 + 回程合并成一个按钮，一点两个时间点一起标（时间轴仍分别画两个点） */
@@ -2916,16 +2931,16 @@ function setTrainTime(d,which,v){
 }
 function toggleWalk(d,min){
   if(!canHab(d))return;
-  var dd=ensureHabitDay(d), k=String(min);
+  var cfg=S.cfg.workout, idx=-1, i, item=min;
+  for(i=0;i<cfg.walks.length;i++){ if(walkRange(cfg.walks[i]).s===min){idx=i;item=cfg.walks[i];break;} }
+  var r=walkRange(item), k=String(r.s);
+  var dd=ensureHabitDay(d);
   if(!dd.workout.walk[k])dd.workout.walk[k]={done:false};
   dd.workout.walk[k].done=!dd.workout.walk[k].done;
   var tag='walk:'+k;
   if(dd.workout.walk[k].done){
-    var cfg=S.cfg.workout, idx=-1, i;
-    for(i=0;i<cfg.walks.length;i++){ if(cfg.walks[i]===+k){idx=i;break;} }
-    var s=+k, e=s+WALK_DUR;
-    carveSegments(d,s,e,null).forEach(function(ev){uncheckHabit(d,ev);});
-    putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:s,e:e,t:(idx>=0?(WALK_LB[idx]||('步行'+(idx+1))):'步行'),plan:false});
+    carveSegments(d,r.s,r.e,null).forEach(function(ev){uncheckHabit(d,ev);});
+    putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:r.s,e:r.e,t:(idx>=0?(WALK_LB[idx]||('步行'+(idx+1))):'步行'),plan:false});
   }else{
     rmHabEv(d,tag);
   }
@@ -3056,8 +3071,10 @@ function renderHabitSettings(){
      '<input class="tmi" type="time" value="'+m2t(c.trainEnd)+'" onchange="setWoCfg(\'trainEnd\',0,this.value)">'+
      '<span class="mut3">周一三五推日 · 周二四六骑行日 · 周日休息</span></div>';
   c.walks.forEach(function(m,i){
+    var r=walkRange(m);
     o+='<div class="dietrow"><span style="width:76px;flex:none;font-size:13px;color:var(--tx)">'+(WALK_LB[i]||('步行'+(i+1)))+'</span>'+
-       '<input class="tmi" type="time" value="'+m2t(m)+'" onchange="setWoCfg(\'walks\','+i+',this.value)"></div>';
+       '<input class="tmi" type="time" value="'+m2t(r.s)+'" onchange="setWoCfg(\'walks\','+i+',this.value)"><span class="mut3">到</span>'+
+       '<input class="tmi" type="time" value="'+m2t(r.e)+'" onchange="setWoCfg(\'walkE\','+i+',this.value)"></div>';
   });
   o+='<div class="dietrow" style="margin-top:4px"><span style="width:76px;flex:none;font-size:13px;color:var(--tx)">骑行通勤</span>'+
      '<span class="mut3">去程 / 回程分别设时间；打卡时一个按钮一起标，只记录，不计入自律</span></div>';
@@ -3072,7 +3089,11 @@ function pickDietW(w){_dietW=String(w);renderHabitSettings();}
 /* 注意：这里只 save + 刷新记录页卡片，不重渲染编辑器本身，避免输入时丢焦点 */
 function setMealField(i,f,v){
   var pl=S.cfg.diet[_dietW]; if(!pl||!pl[i])return;
-  if(f==='time'){var m=t2m(v);if(m==null)return;pl[i].time=m;}
+  if(f==='time'){
+    var m=t2m(v); if(m==null)return;
+    pl[i].time=m;
+    [todayStr(),addD(todayStr(),-1)].forEach(function(dd){ if(S.days[dd]&&syncHabitEvents(dd))save(); });
+  }
   else pl[i][f]=v;
   save();renderMealCard();renderZilv();
 }
@@ -3113,13 +3134,20 @@ function migrateWoKey(kind,oldMin,newMin){
     if(box[ok]){box[nk]={done:!!box[ok].done};delete box[ok];}
   });
 }
+/* 改完步行时间后：同步今天/昨天的事件（删旧键残留段、按新键补建），防止"删了又有/旧段残留" */
+function syncWalkEvents(){
+  [todayStr(),addD(todayStr(),-1)].forEach(function(d){
+    if(S.days[d]&&syncHabitEvents(d))save();
+  });
+}
 function setWoCfg(field,idx,v){
   ensureHabitCfg();
   var m=t2m(v); if(m==null){renderHabitSettings();return;}
   var c=S.cfg.workout;
   if(field==='trainStart'){c.trainStart=m;if(c.trainEnd<=c.trainStart)c.trainEnd=c.trainStart+60;}
   else if(field==='trainEnd'){c.trainEnd=(m<=c.trainStart?c.trainStart+30:m);}
-  else if(field==='walks'){migrateWoKey('walk',c.walks[idx],m);c.walks[idx]=m;}
+  else if(field==='walks'){var oldR=walkRange(c.walks[idx]);migrateWoKey('walk',oldR.s,m);c.walks[idx]={s:m,e:(oldR.e>m?oldR.e:m+30)};syncWalkEvents();}
+  else if(field==='walkE'){var r=walkRange(c.walks[idx]);c.walks[idx]={s:r.s,e:(m<=r.s?r.s+30:m)};syncWalkEvents();}
   else if(field==='commute'){migrateWoKey('commute',c.commute[idx],m);c.commute[idx]=m;}
   save();renderHabitSettings();renderRec();
 }
