@@ -929,7 +929,7 @@ function fmtHM(min){return pad(Math.floor(min/60)%24)+':'+pad(min%60)}
 
 /* ===== 天气 ===== */
 function renderWxAuto(){
-  var w=day(curDate).w||'';
+  var w=((S.days[curDate]||{}).w)||'';
   var el=document.getElementById('wxAuto');
   if(!el)return;
   if(!w){
@@ -987,7 +987,7 @@ function maybeFetchWeather(){
   if(S.cfg.autoWx===false)return;
   if(wxFetching)return;
   if(Math.abs(diffD(todayStr(),curDate))>1)return;
-  var dd=day(curDate),w=(dd.w||'').trim();
+  var dd=S.days[curDate]||{}, w=(dd.w||'').trim();
   if(w)return;
   var now=Date.now(),last=S.cfg.lastWxFetch||0;
   if(now-last<30000)return;
@@ -1056,7 +1056,7 @@ function wxEmoji(w){
   if(w.indexOf('晴')>=0)return '☀️';
   return '🌡️';
 }
-function wxOf(d){return day(d).w||''}
+function wxOf(d){var dd=S.days[d];return (dd&&dd.w)||''}
 
 /* ===== 存储 / 数据模型（事件数组 ev）===== */
 function loadCats(){
@@ -1204,7 +1204,7 @@ function syncHabitEvents(d){
   return false;
 }
 function syncHabitEventsAll(){ var c=false; Object.keys(S.days).forEach(function(d){ if(syncHabitEvents(d))c=true; }); if(c)save(); }
-function eventsOf(d){ return day(d).ev.slice().sort(function(a,b){return a.s-b.s}); }
+function eventsOf(d){ var ev=S.days[d]&&S.days[d].ev; return (ev||[]).slice().sort(function(a,b){return a.s-b.s}); }
 function recordsOf(d){ return eventsOf(d).filter(function(e){return !e.plan}); }
 function plansOf(d){ return eventsOf(d).filter(function(e){return e.plan}); }
 function filledMinutes(d){ var t=0; recordsOf(d).forEach(function(e){t+=Math.max(0,Math.min(1440,e.e)-Math.max(0,e.s));}); return t; }
@@ -1671,14 +1671,14 @@ function dpQuickAdd(){
 /* ===== 每日心情 ===== */
 function firstEmoji(s){var m=/[\uD800-\uDBFF][\uDC00-\uDFFF]/.exec(s);return m?m[0]:''}
 function renderMood(){
-  var m=day(curDate).m||'';
+  var m=(S.days[curDate]||{}).m||'';
   var el=document.getElementById('moodChip');
   if(m) el.innerHTML='<span class="mf">'+esc(m)+'</span>';
   else el.innerHTML='<span class="mf mut3">'+(curDate===todayStr()?'记今天心情':'记这天心情')+'</span>';
 }
 var MOODQ=['😀','😊','😐','😟','😡','😴','😌','💪','🥰','😭'];
 function editMood(){
-  document.getElementById('moodInput').value=day(curDate).m||'';
+  document.getElementById('moodInput').value=((S.days[curDate]||{}).m)||'';
   document.getElementById('moodQuick').innerHTML=MOODQ.map(function(e){return '<button class="rc" onclick="document.getElementById(\'moodInput\').value=this.textContent">'+e+'</button>'}).join('');
   document.getElementById('moodMask').classList.add('on');
 }
@@ -1708,7 +1708,7 @@ function saveGrumble(){
 }
 function closeGrumble(){document.getElementById('grumbleMask').classList.remove('on')}
 function renderGrumble(){
-  var dd=day(curDate), gr=dd.gr||[];
+  var dd=S.days[curDate], gr=(dd&&dd.gr)||[];
   document.getElementById('grumbleCount').textContent=gr.length?(gr.length+' 条'):'';
   document.getElementById('grumbleList').innerHTML = gr.length ?
     gr.slice().reverse().map(function(g){
@@ -1804,7 +1804,7 @@ function renderStat(){
   if(st.tot===0){h+='<div class="hint">这个区间还没有记录。先去记录页填几段。</div>';
     document.getElementById('statBody').innerHTML=h;renderDerive();return}
   if(sv==='day'){h+=dayWeather(r.ds[0])+dayMood(r.ds[0])+donut(st.c,st.tot)+ribbon(r.ds[0])+dayTimeline(r.ds[0])+dayGrumble(r.ds[0])}
-  else if(sv==='week'){h+=stacked(r.ds.map(function(d){var w=wxOf(d),m=day(d).m||'',gr=(day(d).gr||[]).length;return {lab:'日一二三四五六'[pd(d).getDay()],c:tallyEv([d]).c,wx:w?wxEmoji(w):'',mood:m?firstEmoji(m):'',gr:gr}}))}
+  else if(sv==='week'){h+=stacked(r.ds.map(function(d){var dd=S.days[d],w=wxOf(d),m=(dd&&dd.m)||'',gr=((dd&&dd.gr)||[]).length;return {lab:'日一二三四五六'[pd(d).getDay()],c:tallyEv([d]).c,wx:w?wxEmoji(w):'',mood:m?firstEmoji(m):'',gr:gr}}))}
   else if(sv==='month'){h+=heat(r.ds)+stacked(weekB(r.ds))}
   else{var mb=[];for(var m=0;m<12;m++){var sub=r.ds.filter(function(d){return +d.split('-')[1]===m+1});
     mb.push({lab:(m+1),c:tallyEv(sub).c})}h+=stacked(mb)}
@@ -1817,8 +1817,8 @@ function renderStat(){
 }
 function dayWeather(d){var w=wxOf(d);if(!w)return '';
   return '<div class="wxstat">'+wxEmoji(w)+'<span>'+esc(w)+'</span></div>';}
-function dayMood(d){var m=day(d).m||'';if(!m)return '';return '<div class="moodstat">💭 <span>'+esc(m)+'</span></div>';}
-function dayGrumble(d){var gr=day(d).gr||[];if(!gr.length)return '';
+function dayMood(d){var m=(S.days[d]||{}).m||'';if(!m)return '';return '<div class="moodstat">💭 <span>'+esc(m)+'</span></div>';}
+function dayGrumble(d){var gr=(S.days[d]||{}).gr||[];if(!gr.length)return '';
   return '<h3 style="margin-top:14px">💢 这天的牢骚（'+gr.length+' 条）</h3><div class="nlist">'+gr.map(function(g){
     return '<div class="nitem"><span class="ntime">'+esc(g.t)+'</span><span style="flex:1">'+esc(g.x)+'</span></div>'}).join('')+'</div>';}
 /* 当天时间线：按时间顺序列出这天所有记录段（时间 + 分类色条 + 分类名 + 备注），随统计页日期切换 */
@@ -1839,8 +1839,9 @@ function dayTimeline(d){
 function moodReview(ds){
   var moods=[],gr=[];
   ds.forEach(function(d){
-    var m=day(d).m||''; if(m)moods.push({d:d,m:m,em:firstEmoji(m)});
-    (day(d).gr||[]).forEach(function(g){gr.push({d:d,t:g.t,x:g.x})});
+    var dd=S.days[d];
+    var m=(dd&&dd.m)||''; if(m)moods.push({d:d,m:m,em:firstEmoji(m)});
+    ((dd&&dd.gr)||[]).forEach(function(g){gr.push({d:d,t:g.t,x:g.x})});
   });
   if(!moods.length && !gr.length)return '';
   var h='<h3 style="margin-top:18px">心情 & 牢骚回顾</h3>';
@@ -1926,7 +1927,7 @@ function heat(ds){
     var pos=off+idx,cx=(pos%7)*(cell+gap),cy=Math.floor(pos/7)*(cell+gap)+22;
     var f=hasDay(d)?filledMinutes(d):0,ra=f/1440;
     var ww=wxOf(d),we=ww?wxEmoji(ww):'';
-    var mm=day(d).m||'',me=mm?firstEmoji(mm):'';
+    var mm=(S.days[d]||{}).m||'',me=mm?firstEmoji(mm):'';
     p+='<rect x="'+cx+'" y="'+cy+'" width="'+cell+'" height="'+cell+'" rx="6" fill="'+(f===0?'var(--line2)':shade(ra))+'"><title>'+d+' · '+(f/60).toFixed(1)+'h'+(ww?(' · '+esc(ww)):'')+(mm?(' · '+esc(mm)):'')+'</title></rect>';
     p+='<text x="'+(cx+cell/2)+'" y="'+(cy+cell/2+4)+'" font-size="10" fill="'+(ra>0.55?'#fff':'var(--tx)')+'" text-anchor="middle">'+(+d.split('-')[2])+'</text>';
     if(we||me)p+='<text x="'+(cx+cell/2)+'" y="'+(cy+cell-4)+'" font-size="9" text-anchor="middle" fill="'+(ra>0.55?'#fff':'var(--tx)')+'" opacity=".85">'+(we||'')+(me?(' '+(me)):'')+'</text>'});
@@ -2315,7 +2316,7 @@ function newTemplate(){
   /* 默认按今天饮食方案预填 3 餐（与记录页早/中/晚同步） */
   ensureHabitCfg();
   var w=wdKey(todayStr()), pl=S.cfg.diet[w]||[];
-  var segs=pl.map(function(m){return {a:Math.floor(m.time/30),e:Math.floor((m.time+(m.dur||MEAL_DUR))/30),k:'E',t:m.name};});
+  var segs=pl.map(function(m){return {a:Math.floor(m.time/30),e:Math.ceil((m.time+(m.dur||MEAL_DUR))/30),k:'E',t:m.name};});
   S.cfg.templates.push({name:'新模板 '+(S.cfg.templates.length+1),segs:segs});
   S.cfg.curTpl=S.cfg.templates.length-1;save();renderTplEditor();toast('已按今天饮食方案预填 '+(segs.length||0)+' 段');
 }
@@ -2385,13 +2386,11 @@ function updateApplyLbl(){var el=document.getElementById('applyDayLbl'); if(el)e
 function applyTemplate(idx,d){
   var tp=S.cfg.templates[idx]; if(!tp||!tp.segs||!tp.segs.length){toast('先在设置里配置作息模板');setPane('set');return;}
   var segs=tp.segs, nm=(d===todayStr())?minNow():1440;
-  var counts={rec:0,plan:0,skip:0}, dayMap=[addD(d,-1),d,addD(d,1)];
+  var counts={rec:0,plan:0,skip:0};
   segs.forEach(function(seg){
     for(var slot=seg.a;slot<seg.e;slot++){
       var info=tplSlotInfo(slot);
-      var targetD=dayMap[info.dayIdx]; if(!targetD)continue;
-      var minute=info.slotInDay*30;
-      var tD=targetD, mi=minute;
+      var tD=d, mi=info.slotInDay*30;   /* 模板只映射目标日当天（24h 窗口，dayIdx 恒 0） */
       var toEv = function(cat,txt,plan){
         var overlap=recordsOf(tD).some(function(e){return Math.max(e.s,mi)<Math.min(e.e,mi+30);});
         var planOverlap=((S.days[tD]&&S.days[tD].ev)||[]).some(function(e){return e.plan&&Math.max(e.s,mi)<Math.min(e.e,mi+30);});
