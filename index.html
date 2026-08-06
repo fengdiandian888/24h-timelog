@@ -1132,6 +1132,32 @@ function delEvent(d,gid){
   }
   dd.ev=dd.ev.filter(function(x){return x.gid!==gid && x.id!==gid;});
 }
+/* 取消打卡勾选（与 delEvent 的 hab 处理同源，供裁剪复用） */
+function uncheckHabit(d,ev){
+  var tag=ev&&ev.hab; if(!tag)return;
+  var dd=day(d);
+  if(tag.indexOf('meal:')===0){ if(dd.meal&&dd.meal[tag.slice(5)])delete dd.meal[tag.slice(5)]; }
+  else if(tag==='train'){ if(dd.workout&&dd.workout.train)dd.workout.train.done=false; }
+  else if(tag.indexOf('walk:')===0){ if(dd.workout&&dd.workout.walk)delete dd.workout.walk[tag.slice(5)]; }
+}
+/* 强制时间唯一：把 [s,e) 内与其它段重叠的部分让位（谁后保存谁压谁）。
+   返回被整段删除的段数组（hab 段被压即整段删，调用方负责 uncheckHabit；手动段被压则裁掉重叠部分，完全覆盖才删）。 */
+function carveSegments(d,s,e,keepGid){
+  var dd=day(d), out=[], removed=[];
+  dd.ev.forEach(function(ev){
+    if(keepGid&&(ev.gid===keepGid||ev.id===keepGid)){out.push(ev);return;}
+    var a=Math.max(ev.s,s), b=Math.min(ev.e,e);
+    if(b<=a){out.push(ev);return;}                 /* 无重叠，保留 */
+    if(ev.hab){removed.push(ev);return;}           /* 打卡段被压：整段让位（勾选由调用方取消） */
+    var left=(ev.s<a)?{s:ev.s,e:a}:null, right=(ev.e>b)?{s:b,e:ev.e}:null;
+    if(!left&&!right){removed.push(ev);return;}    /* 完全被覆盖 */
+    var base={id:ev.id,gid:ev.gid,cat:ev.cat,t:ev.t,plan:ev.plan};
+    if(left)out.push(Object.assign({},base,left));
+    if(right)out.push(Object.assign({},base,right));
+  });
+  dd.ev=out.sort(function(x,y){return x.s-y.s;});
+  return removed;
+}
 /* ===== 打卡习惯 ↔ 时间记录段 联动：勾选=新增记录段（吃饭/运动分类），取消=删除；删记录=自动取消勾选 ===== */
 function putHabEv(d,ev){ var dd=day(d),i; for(i=0;i<dd.ev.length;i++){ if(dd.ev[i].hab===ev.hab){dd.ev[i]=ev; dd.ev.sort(function(a,b){return a.s-b.s}); return;} } addEvent(d,ev); }
 function rmHabEv(d,tag){ var dd=day(d),n=dd.ev.length; dd.ev=dd.ev.filter(function(x){return x.hab!==tag;}); return dd.ev.length!==n; }
@@ -1458,12 +1484,22 @@ function saveSeg(){
   if(cat==='.'){ /* 不分类：仅当编辑已存在时删除，不新建 */ if(edEvId){save();closeEdit();renderRec();renderToday();renderStat();toast('已清空该段');} else {toast('请选择分类');} return; }
   var gid=edEvId||uid();
   var plan = edPlan;
-  if(t.e<=1440){ addEvent(d,{id:uid(),gid:gid,cat:cat,s:t.s,e:t.e,t:tx,plan:plan}); }
-  else { addEvent(d,{id:uid(),gid:gid,cat:cat,s:t.s,e:1440,t:tx,plan:plan}); addEvent(addD(d,1),{id:uid(),gid:gid,cat:cat,s:0,e:t.e-1440,t:tx,plan:plan}); }
+  var victims=[];
+  if(t.e<=1440){
+    victims=carveSegments(d,t.s,t.e,gid);
+    addEvent(d,{id:uid(),gid:gid,cat:cat,s:t.s,e:t.e,t:tx,plan:plan});
+  }else{
+    victims=carveSegments(d,t.s,1440,gid).concat(carveSegments(addD(d,1),0,t.e-1440,gid));
+    addEvent(d,{id:uid(),gid:gid,cat:cat,s:t.s,e:1440,t:tx,plan:plan}); addEvent(addD(d,1),{id:uid(),gid:gid,cat:cat,s:0,e:t.e-1440,t:tx,plan:plan});
+  }
+  victims.forEach(function(ev){uncheckHabit(d,ev);uncheckHabit(addD(d,1),ev);});
   if(!plan && cat!=='.')S.cfg.lastCat=cat;
   if(tx){var r=S.cfg.recent||[];r=r.filter(function(x){return x!==tx});r.unshift(tx);S.cfg.recent=r.slice(0,12);}
   save();closeEdit();renderRec();renderToday();renderStat();
-  toast(plan?'已安排预备 '+fmtHM(t.s)+' · '+catName(cat):'已记录 '+fmtHM(t.s)+'-'+fmtHM(t.e%1440)+' · '+catName(cat));
+  toast(plan?'已安排预备 '+fmtHM(t.s)+' · '+catName(cat)+
+    (victims.length?('（已让位 '+victims.length+' 段重叠）'):''):
+    '已记录 '+fmtHM(t.s)+'-'+fmtHM(t.e%1440)+' · '+catName(cat)+
+    (victims.length?('（已让位 '+victims.length+' 段重叠）'):''));
 }
 function clearSeg(){
   if(edEvId){ delEvent(edDay,edEvId); save();closeEdit();renderRec();renderToday();renderStat();toast('已清空该段'); }
@@ -2791,7 +2827,9 @@ function toggleMeal(d,mid){
     rmHabEv(d,'meal:'+mid);
   }else{
     dd.meal[mid]={done:true,at:item.time};
-    putHabEv(d,{id:uid(),gid:uid(),hab:'meal:'+mid,cat:'E',s:item.time,e:item.time+(item.dur||MEAL_DUR),t:item.name,plan:false});
+    var s=item.time, e=s+(item.dur||MEAL_DUR);
+    carveSegments(d,s,e,null).forEach(function(ev){uncheckHabit(d,ev);});
+    putHabEv(d,{id:uid(),gid:uid(),hab:'meal:'+mid,cat:'E',s:s,e:e,t:item.name,plan:false});
   }
   save();afterHabitChange();
 }
@@ -2863,6 +2901,7 @@ function toggleTrain(d){
   if(t.done){
     if(t.s==null)t.s=S.cfg.workout.trainStart;
     if(t.e==null||t.e<=t.s)t.e=(t.s||S.cfg.workout.trainStart)+60;
+    carveSegments(d,t.s,t.e,null).forEach(function(ev){uncheckHabit(d,ev);});
     putHabEv(d,{id:uid(),gid:uid(),hab:'train',cat:'4',s:t.s,e:t.e,t:trainName(d),plan:false});
   }else{
     rmHabEv(d,'train');
@@ -2875,9 +2914,10 @@ function setTrainTime(d,which,v){
   var dd=ensureHabitDay(d), t=dd.workout.train;
   if(which==='s'){t.s=m;if(t.e<=t.s)t.e=t.s+30;}
   else{t.e=(m<=t.s?t.s+30:m);}
-  if(t.done){ /* 训练已勾选 → 记录段跟着改时间 */
-    var ev=null,i; for(i=0;i<dd.ev.length;i++){ if(dd.ev[i].hab==='train'){ev=dd.ev[i];break;} }
-    if(ev){ev.s=t.s;ev.e=t.e;ev.t=trainName(d);dd.ev.sort(function(a,b){return a.s-b.s});}
+  if(t.done){ /* 训练已勾选 → 记录段跟着改时间（并让位给重叠段） */
+    rmHabEv(d,'train');
+    carveSegments(d,t.s,t.e,null).forEach(function(ev){uncheckHabit(d,ev);});
+    putHabEv(d,{id:uid(),gid:uid(),hab:'train',cat:'4',s:t.s,e:t.e,t:trainName(d),plan:false});
   }
   save();afterHabitChange();
 }
@@ -2890,7 +2930,9 @@ function toggleWalk(d,min){
   if(dd.workout.walk[k].done){
     var cfg=S.cfg.workout, idx=-1, i;
     for(i=0;i<cfg.walks.length;i++){ if(cfg.walks[i]===+k){idx=i;break;} }
-    putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:+k,e:+k+WALK_DUR,t:(idx>=0?(WALK_LB[idx]||('步行'+(idx+1))):'步行'),plan:false});
+    var s=+k, e=s+WALK_DUR;
+    carveSegments(d,s,e,null).forEach(function(ev){uncheckHabit(d,ev);});
+    putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:s,e:e,t:(idx>=0?(WALK_LB[idx]||('步行'+(idx+1))):'步行'),plan:false});
   }else{
     rmHabEv(d,tag);
   }
