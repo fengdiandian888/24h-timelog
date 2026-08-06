@@ -1,0 +1,15 @@
+{
+  "name": "24小时时间记录台",
+  "short_name": "时间记录台",
+  "description": "单文件 24 小时时间轴记录工具，支持饮食/运动打卡、自律判定、统计和想法炉",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F8FA",
+  "theme_color": "#2B2A28",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
