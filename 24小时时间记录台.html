@@ -534,7 +534,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
   <div class="daytabs" id="dayTabs">
     <button class="dtab" data-d="-1" onclick="setViewDay(-1)">昨天</button>
     <button class="dtab on" data-d="0" onclick="setViewDay(0)">今天</button>
-    <button class="dtab" data-d="1" onclick="setViewDay(1)">明天</button>
   </div>
   <div class="card daycard" id="planCard" style="display:none;margin-top:12px">
     <div class="row"><span class="dtitle2">📌 预备安排</span><div class="sp"></div><span class="mut3" id="planCount"></span></div>
@@ -558,7 +557,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <div class="daytabs" id="dpTabs">
       <button class="dtab" data-d="-1" onclick="setViewDay(-1)">昨天</button>
       <button class="dtab on" data-d="0" onclick="setViewDay(0)">今天</button>
-      <button class="dtab" data-d="1" onclick="setViewDay(1)">明天</button>
     </div>
     <div class="dplegend">
       <span><i class="dplg" style="background:#635BFF"></i>已记录</span>
@@ -1394,7 +1392,7 @@ function txtOn(hex){
 }
 function lastEventEnd(d){ var m=0; recordsOf(d).forEach(function(e){ if(e.e>m)m=e.e; }); return m; }
 function setViewDay(off){curDate=addD(todayStr(),off);renderRec();renderDayPlan();}
-function updateDayTabs(){var off=diffD(todayStr(),curDate);document.querySelectorAll('#dayTabs .dtab, #dpTabs .dtab').forEach(function(b){b.classList.toggle('on',+b.dataset.d===off)});}
+function updateDayTabs(){var off=diffD(curDate,todayStr());document.querySelectorAll('#dayTabs .dtab, #dpTabs .dtab').forEach(function(b){b.classList.toggle('on',+b.dataset.d===off)});}
 function goToday(){curDate=todayStr();renderRec();updateDayTabs();}
 function recNow(){goToday(); if(S.cfg.lastCat) quickContinue(S.cfg.lastCat); else openCapsule(curDate,Math.floor(minNow()/60),null);}
 function openToday(){document.getElementById('todayModal').classList.add('on')}
