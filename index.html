@@ -720,11 +720,8 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     </div>
     <div class="mut3" style="margin-top:4px;font-size:12px">结束小时 < 开始小时，表示跨到第二天（如 23:00 → 次日 07:00）</div>
     <div class="qtimebar" id="edQuickTimes" style="margin-top:8px">
-      <button class="qtime" id="qtimeNow" onclick="qtimeNow()">现在</button>
       <button class="qtime" onclick="qtimePlus(30)">+30分</button>
       <button class="qtime" onclick="qtimePlus(60)">+1小时</button>
-      <button class="qtime" onclick="qtimeRound()">到整点</button>
-      <button class="qtime" onclick="qtimeFree()">从空闲起</button>
     </div>
   </div>
   <div id="edPlanHint" class="hint" style="display:none;margin-top:12px">📌 这是还没到的时段，先安排上。等时间到了，再点「转正式记录」。</div>
@@ -1331,7 +1328,7 @@ function openCapsule(d,hour,evId,startMin){
   document.getElementById('edPlanHint').style.display = edPlan? 'block':'none';
   document.getElementById('edToRecord').style.display = (edPlan && !editableEv(d,sMin))? 'none' : (edPlan? 'inline-flex':'none');
   document.getElementById('edTitle').textContent = edPlan? '预备安排（计划）' : (evId? '编辑这段':'新增一段记录');
-  renderEdCats(); renderRecentTags(); refreshQuickTimes(); renderSegList();
+  renderEdCats(); renderRecentTags(); renderSegList();
   document.getElementById('editMask').classList.add('on');
 }
 function editEvent(d,id){ openCapsule(d,Math.floor((eventsOf(d).filter(function(e){return (e.gid||e.id)===id;})[0]||{s:0}).s/60),id); }
@@ -1442,46 +1439,13 @@ function renderRecentTags(){
       return '<button class="rtag" onclick="document.getElementById(\'edText\').value=this.textContent">'+esc(t)+'</button>';
     }).join('');
 }
-function refreshQuickTimes(){
-  var qn=document.getElementById('qtimeNow');
-  if(qn) qn.style.display = edEvId? 'none' : '';
-}
-function qtimeNow(){
-  var d=edDay;
-  if(edEvId)return;                 /* 编辑已有段时按钮已隐藏，此处兜底 */
-  var s=lastEventEnd(d);
-  if(s>=1440){toast('这一天已记满');return;}   /* 昨天已满：不 setEdTime，避免 00:00-00:00 */
-  var e=(d===todayStr())?minNow():1440;
-  if(e<=s)e=s+30;
-  if(e>1440)e=1440;
-  setEdTime(s,e);
-}
+/* 快捷加时长：在结束时间基础上累加（连续点连续加；新增段未设结束则从开始起算） */
 function qtimePlus(m){
-  var t=getEdTime(), s=t.s, e=Math.min(s+m,1440);
+  var t=getEdTime(), s=t.s, e=t.e;
   if(s>=1440){toast('这一天已记满');return;}   /* 昨天已满：不 setEdTime，避免 00:00-00:00 */
+  if(e>s)e=Math.min(e+m,1440);                 /* 已有结束时间 → 往后推 m */
+  else e=Math.min(s+m,1440);                   /* 还没设结束 → 从开始 +m */
   if(e<=s)e=Math.min(1440,s+30);
-  setEdTime(s,e);
-}
-function qtimeRound(){
-  var t=getEdTime(), s=t.s, e=Math.ceil(s/60)*60;
-  if(e<=s)e=s+60;
-  if(e>1440)e=1440;
-  setEdTime(s,e);
-}
-function hourFull(d,h){
-  var s0=h*60,s1=s0+60;
-  var evs=hourEvents(d,h).filter(function(e){return !e.plan;});
-  for(var m=s0;m<s1;m++){
-    var busy=evs.some(function(e){return m>=e.s&&m<e.e;});
-    if(!busy)return false;
-  }
-  return true;
-}
-function qtimeFree(){
-  var d=edDay,h=edHour,s,e;
-  if(hourFull(d,h)){ s=lastEventEnd(d); e=s+30; }
-  else { s=firstFreeStart(d,h); e=s+30; }
-  if(e>1440)e=1440;
   setEdTime(s,e);
 }
 var _undoTimer=null,_undoFn=null;
