@@ -21,7 +21,7 @@ html{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
 background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
 min-height:100vh;min-height:100dvh}
-.wrap{max-width:1080px;margin:0 auto;padding:14px 14px 0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.wrap{max-width:100%;padding:14px 14px 0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 h1{font-size:17px;font-weight:600}h2{font-size:15px;font-weight:600}h3{font-size:13px;font-weight:600;color:var(--tx2)}
 button{font-family:inherit;font-size:14px;cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:inherit;font-size:16px;color:var(--tx)}
@@ -93,7 +93,6 @@ display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500}
 .moodchip{flex:1;min-height:44px;border:1px solid var(--line2);border-radius:11px;background:#fff;padding:8px 13px;text-align:left;font-size:14px;color:var(--tx);display:flex;align-items:center}
 .moodchip .mf{line-height:1.4;word-break:break-word}
 .grumble{background:var(--red-l);border-color:#FBC6CE;color:var(--red)}
-.grumble:hover{background:var(--red-l)}
 .gitem{display:flex;gap:9px;padding:9px 2px;border-bottom:1px solid var(--line)}
 .gitem:last-child{border-bottom:none}
 .gtime{font-size:12px;color:var(--tx2);font-variant-numeric:tabular-nums;flex:none;min-width:42px}
@@ -120,9 +119,10 @@ display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));margin:auto
 .modal{background:#fff;border-radius:14px;padding:18px;max-width:400px;width:100%;margin:auto}
 .modal p{font-size:13.5px;color:var(--tx2);margin:9px 0 16px}
 .mask.mid{align-items:center;padding:18px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--tx);color:#fff;
-padding:10px 18px;border-radius:22px;font-size:13px;z-index:99;opacity:0;transition:.2s;pointer-events:none}
-.toast.on{opacity:1}
+.toast{position:fixed;left:50%;bottom:96px;background:var(--tx);color:#fff;
+padding:10px 18px;border-radius:22px;font-size:13px;z-index:99;opacity:0;pointer-events:none;
+transform:translate(-50%,0);transition:opacity .22s,transform .22s}
+.toast.on{opacity:1;transform:translate(-50%,-10px)}
 @media(max-width:768px){
 .wrap{padding:12px 12px 0}
 .kpis{grid-template-columns:repeat(2,1fr)}
@@ -176,7 +176,7 @@ display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;
 .qtimebar{display:flex;gap:6px;flex-wrap:wrap}
 .qtime{border:1px solid var(--line2);background:#fff;border-radius:9px;padding:6px 11px;font-size:12.5px;color:var(--acc);font-weight:500}
 .qtime:active{background:var(--empn)}
-/* D. 续记撤销条（固定底部浮层）*/
+/* 删除撤销条（固定底部浮层，5 秒可恢复）*/
 .undobar{position:fixed;left:50%;transform:translateX(-50%);bottom:150px;background:var(--tx);color:#fff;
 padding:8px 8px 8px 18px;border-radius:26px;font-size:13px;z-index:50;opacity:0;transition:.2s;pointer-events:none;
 display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22);max-width:92vw;white-space:nowrap}
@@ -184,7 +184,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .undobar button{color:#fff;background:rgba(255,255,255,.2);border-radius:18px;padding:6px 16px;font-size:13px;font-weight:600;white-space:nowrap}
 .undobar button:active{background:rgba(255,255,255,.34)}
 /* ===== 胶囊时间轴（整点小时块，无刻度线，同块多段渐变）===== */
-.daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:3px 3px}
+.daygrid{margin-top:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px 3px}
 .hblock{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:60px;cursor:pointer;transition:box-shadow .15s}
 .hblock.nowcap{box-shadow:0 0 0 2.5px var(--tx2)}
 .hblock:active{transform:scale(.985)}
@@ -263,16 +263,8 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .calnum{font-size:11.5px;font-weight:700}
 .caldur{font-size:10px;color:var(--tx2);margin-top:2px}
 .calok{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#71BF50}
-.remind{background:#FFF8D6;border:1px solid #E8C547;border-radius:12px;padding:11px 12px}
-.remind.warn{background:#FFF1E0;border-color:#E8943A}
-.remind.warn .rtitle{color:#8a4d14}
-.remind .rtitle{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:#7A5C00}
-.ritem{display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:#fff;border:1px solid #E8C547;border-radius:9px}
-.ritem .riic{width:4px;height:18px;border-radius:2px;flex:none}
-.ritem .ritm{font-variant-numeric:tabular-nums;font-weight:600;color:var(--tx2)}
-.ritem .rinm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ===== Day Planner 日程视图（竖条长列：左分类色条-时间-分类名-备注）===== */
-.dpwrap{max-width:880px;margin:0 auto}
+.dpwrap{max-width:100%;margin:0}
 .dphead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .dplegend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:12px;color:var(--tx2)}
 .dplg{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-2px;margin-right:5px}
@@ -281,10 +273,8 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .pt-empty{padding:20px 10px;text-align:center;color:var(--tx3);font-size:13px}
 /* 一级行：窄长条（竖条）——左 5px 分类色条 + 右 时间/分类名，紧凑胶囊形，类似 .dlcard */
 .pt-row{display:flex;align-items:stretch;min-height:34px;margin-bottom:5px;background:var(--emp);border:1px solid var(--line);border-radius:9px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s}
-.pt-row:hover{border-color:var(--line2);background:#FBFCFE}
 .pt-row:active{background:var(--empn)}
 .pt-row.plan{border-color:rgba(99,91,255,.35);background:rgba(99,91,255,.05)}
-.pt-row.plan:hover{background:rgba(99,91,255,.09)}
 .pt-bar{flex:none;width:5px;align-self:stretch;border-radius:8px 0 0 8px}
 .pt-sub .pt-bar{width:3px;border-radius:7px 0 0 7px}
 .pt-body{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:5px 10px}
@@ -295,7 +285,6 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .pt-merge{font-size:11px;color:var(--tx3);flex:none;white-space:nowrap}
 /* 二级行（有备注）：更窄竖条 + 备注文字，缩进对齐一级行时间之后 */
 .pt-sub{display:flex;align-items:stretch;min-height:28px;margin:0 0 5px 112px;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s}
-.pt-sub:hover{border-color:var(--line2)}
 .pt-sub:active{background:var(--empn)}
 .pt-note{flex:1;min-width:0;padding:4px 10px 4px 8px;font-size:12.5px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pt-add{display:flex;justify-content:center;padding:8px 0 2px}
@@ -306,7 +295,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .pt-sub{margin-left:100px}
 }
 /* ===== 周视图：最近 7 天迷你竖轴（统计页数值的可视化补充）===== */
-.wkwrap{max-width:880px;margin:0 auto}
+.wkwrap{max-width:100%;margin:0}
 .wklegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--tx2)}
 .wklegend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
 .wkscroll{display:flex;align-items:flex-start;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:14px;padding-bottom:6px}
@@ -320,10 +309,9 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .wklab span{display:block;font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
 .wkcol.today .wklab b{color:var(--tx)}
 .wkcol.today .wklab span{color:var(--acc-h);font-weight:600}
-.wkaxis{position:relative;height:var(--wkh);border:1px solid var(--line);border-radius:8px;background:var(--emp);overflow:hidden;cursor:pointer;transition:box-shadow .15s}
-.wkaxis:hover{box-shadow:0 0 0 1.5px var(--line2)}
+.wkaxis{position:relative;height:var(--wkh);border:1px solid var(--line);border-radius:8px;background:var(--emp);overflow:hidden;cursor:pointer}
 /* 「今天」沿用胶囊 .nowcap 的深灰外框高亮 */
-.wkaxis.today,.wkaxis.today:hover{box-shadow:0 0 0 2.5px var(--tx2)}
+.wkaxis.today{box-shadow:0 0 0 2.5px var(--tx2)}
 .wkaxis.blank{background:var(--empn);border-style:dashed;border-color:var(--line2)}
 .wkaxis .wkfill{position:absolute;inset:0;z-index:0}
 .wkaxis .wkseg{position:absolute;left:0;right:0;z-index:0;border-radius:0}
@@ -388,7 +376,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 .wkmark{width:11px;height:11px;border-radius:3px;display:block;}
 .wkmark.off{opacity:.16;}
 /* ===== 饮食 / 运动 / 自律 ===== */
-.habitwrap{max-width:880px;margin:12px auto 0}
+.habitwrap{max-width:100%;margin:12px 0 0}
 .zilvbar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:9px}
 .zilv{font-size:12px;font-weight:700;padding:5px 11px;border-radius:16px;border:1px solid var(--line2);background:#fff;color:var(--tx3);white-space:nowrap}
 .zilv.on{background:rgba(31,169,113,.10);border-color:rgba(31,169,113,.38);color:#1FA971}
@@ -396,8 +384,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 .zilvtip{font-size:11.5px;color:var(--tx3);flex:1;min-width:120px}
 .zilvtip.warn{color:#C0392B;font-weight:600}
 .habitrow{display:flex;gap:10px;align-items:stretch}
-.hbcard{flex:1;min-width:0;margin-bottom:0;cursor:pointer;transition:box-shadow .15s,transform .12s}
-.hbcard:hover{box-shadow:0 2px 10px rgba(10,37,64,.07)}
+.hbcard{flex:1;min-width:0;margin-bottom:0;cursor:pointer;transition:transform .12s}
 .hbcard:active{transform:scale(.99)}
 .hbtop{display:flex;align-items:center;gap:6px}
 .hbdot{width:8px;height:8px;border-radius:50%;flex:none}
@@ -455,8 +442,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 /* 降级：系统开启「减少动态效果」时关掉打卡模块的过渡与缩放 */
 @media (prefers-reduced-motion: reduce){
   .hbcard,.mealbtn,.wobtn{transition:none}
-  .hbcard:active,.mealbtn:active,.wobtn:active,
-  .hbcard:hover,.mealbtn:hover,.wobtn:hover{transform:none}
+  .hbcard:active,.mealbtn:active,.wobtn:active{transform:none}
   .hbbar>i{transition:none}
 }
 </style>
@@ -479,7 +465,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
       <div class="tdbadge" id="tdBadge" onclick="openToday()"><span class="tdn" id="tdNum">0</span><span class="tdl">待处理</span></div>
     </div>
   </div>
-  <div id="remindBanner" style="display:none"></div>
   <div id="lockNote" class="hint" style="display:none"></div>
   <div id="storageWarn" class="hint" style="display:none">⚠️ 存储已用 80% 以上，建议去「设置 → 数据」导出 JSON 备份，避免写满丢数据。</div>
   <div class="sumbar sumsticky" id="sumbar"></div>
@@ -637,14 +622,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <p class="mut3" style="margin-top:4px">设置每类活动的周目标小时数，统计页「本周目标」会对比实际进度。</p>
     <div id="goalList" style="margin-top:10px"></div>
   </div>
-  <div class="card">
-    <h2>到点提醒</h2>
-    <div class="row" style="margin-top:8px;gap:7px;cursor:pointer" onclick="toggleNotify()">
-      <div class="sw2" id="notifySw"><b></b></div>
-      <span style="font-size:13px">系统通知（预备安排到点时弹窗）</span>
-      <span class="mut3" style="flex:1;min-width:120px">需浏览器授权；即使不授权，记录页顶部也会显示提醒条</span>
-    </div>
-  </div>
   <div class="card" id="habitSettings">
     <h2>饮食 / 运动 打卡</h2>
     <p class="mut3" style="margin-top:4px">每天几顿、吃什么、几点训练几点走路，都在这里改。改完记录页立刻生效。</p>
@@ -707,7 +684,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 <nav>
   <button class="nvb on" data-p="rec" onclick="setPane('rec')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v14H4zM4 10h16M4 15h16M9 5v14"/></svg>记录</button>
   <button class="nvb" data-p="dayplan" onclick="setPane('dayplan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>日程</button>
-  <button class="nvb" data-p="stat" onclick="setPane('stat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19v-7M12 19V5M19 19v-4"/></svg>统计</button>
+  <button class="nvb" data-p="stat" onclick="setPane('stat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 19v-7M12 19V5M19 19v-4"/></svg>统计</button>
   <button class="nvb" data-p="idea" onclick="setPane('idea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.4 10.9c.5.4.9 1 .9 1.6h5c0-.6.4-1.2.9-1.6A6 6 0 0 0 12 3z"/></svg>想法炉</button>
   <button class="nvb" data-p="set" onclick="setPane('set')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.6 14H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3.6V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.5 1.5l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>设置</button>
 </nav>
@@ -755,7 +732,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <div class="catpick" id="edCats" style="margin-top:6px"></div></div>
   <div class="fld" style="margin-top:12px"><label>具体在做什么</label>
     <div class="rtagrow" id="edRecentTags" style="display:none"></div>
-    <input type="text" id="edText" placeholder="">
+    <input type="text" id="edText" placeholder="" onkeydown="if(event.key==='Enter'){event.preventDefault();saveSeg()}">
   </div>
   <div style="margin-top:14px"><label class="mut3">当天已有段落（点改编辑，点删删除）</label>
     <div class="segedit" id="edSegList" style="margin-top:6px"></div></div>
@@ -1164,7 +1141,6 @@ function renderRec(){
   renderPlanList();
   updateDayTabs();
   maybeFetchWeather();
-  checkReminders();
   renderDayPlan();
   renderMealCard();renderWorkoutCard();renderTimeline();renderZilv();
 }
@@ -1411,7 +1387,7 @@ function renderSegList(){
       '<span class="scat" style="color:'+txtOn(catColor(ev.cat))+'">'+esc(cat.n)+(ev.plan?'（计划）':'')+'</span>'+
       '<span class="snote">'+noteHtml+'</span>'+
       '<button class="sbtn" onclick="editEvent(\''+edDay+'\',\''+gid+'\')">改</button>'+
-      '<button class="sbtn del" onclick="delEvent(\''+edDay+'\',\''+gid+'\');renderSegList();renderRec();toast(\'已删除该段\')">删</button></div>';
+      '<button class="sbtn del" onclick="delEventUndo(\''+edDay+'\',\''+gid+'\');closeEdit()">删</button></div>';
   }).join('');
 }
 function saveSeg(){
@@ -1419,10 +1395,8 @@ function saveSeg(){
   if(t.e<=t.s){toast('结束必须晚于开始');return;}
   var d=edDay, cat=edCat, tx=document.getElementById('edText').value.trim();
   if(edPlan && !editableEv(d,t.s) && (d!==todayStr()||t.s>minNow())){ /* 未来计划保持 plan */ }
-  if(edEvId){
-    delEvent(d,edEvId);
-  }
-  if(cat==='.'){ /* 不分类：仅当编辑已存在时删除，不新建 */ if(edEvId){save();closeEdit();renderRec();renderToday();renderStat();toast('已清空该段');} else {toast('请选择分类');} return; }
+  if(cat==='.'){ /* 不分类：仅当编辑已存在时删除，不新建 */ if(edEvId){delEventUndo(d,edEvId,'已清空该段');closeEdit();} else {toast('请选择分类');} return; }
+  if(edEvId)delEvent(d,edEvId);
   var gid=edEvId||uid();
   var plan = edPlan;
   var victims=[];
@@ -1443,7 +1417,7 @@ function saveSeg(){
     (victims.length?('（已让位 '+victims.length+' 段重叠）'):''));
 }
 function clearSeg(){
-  if(edEvId){ delEvent(edDay,edEvId); save();closeEdit();renderRec();renderToday();renderStat();toast('已清空该段'); }
+  if(edEvId){ delEventUndo(edDay,edEvId,'已清空该段'); closeEdit(); }
   else { closeEdit(); }
 }
 function edToRecord(){
@@ -1510,43 +1484,50 @@ function qtimeFree(){
   if(e>1440)e=1440;
   setEdTime(s,e);
 }
-var _undoTimer=null,_undoGid=null,_undoDate=null;
-function showUndoBar(msg,gid,d){
+var _undoTimer=null,_undoFn=null;
+function showUndoBar(msg,fn){
   document.getElementById('undoMsg').textContent=msg;
   document.getElementById('undoBar').classList.add('on');
-  _undoGid=gid;_undoDate=d;
+  _undoFn=fn;
   clearTimeout(_undoTimer);
   _undoTimer=setTimeout(hideUndoBar,5000);
 }
 function hideUndoBar(){
   document.getElementById('undoBar').classList.remove('on');
-  _undoGid=null;_undoDate=null;
+  _undoFn=null;
 }
 function undoQuick(){
-  if(!_undoGid||!_undoDate){hideUndoBar();return;}
-  var d=_undoDate,gid=_undoGid;
-  var exists=eventsOf(d).some(function(e){return (e.gid||e.id)===gid;});
-  hideUndoBar();
-  if(!exists){toast('该段已不存在');return;}
-  delEvent(d,gid);
+  if(!_undoFn){hideUndoBar();return;}
+  var fn=_undoFn; hideUndoBar();
+  try{fn();}catch(e){toast('撤销失败');}
+}
+/* 删除一段（手动/计划）并弹出 5 秒撤销条：先快照，撤销时原样恢复（含打卡勾选） */
+function delEventUndo(d,gid,msg){
+  var dd=day(d), ev=null, i;
+  for(i=0;i<dd.ev.length;i++){ if(dd.ev[i].gid===gid||dd.ev[i].id===gid){ev=dd.ev[i];break;} }
+  if(!ev){toast('该段已不存在');return;}
+  var snap=JSON.parse(JSON.stringify(ev)), dm=d;
+  delEvent(dm,gid);
   save();renderRec();renderToday();renderStat();
-  if(document.getElementById('editMask').classList.contains('on'))renderSegList();
-  toast('已撤销刚才的续记');
+  showUndoBar((msg||'已删除')+' '+fmtHM(ev.s)+'-'+fmtHM(ev.e%1440)+' · '+catName(ev.cat)+(ev.plan?'（计划）':''), function(){
+    restoreEvent(dm,snap);
+    save();renderRec();renderToday();renderStat();
+    var m=document.getElementById('editMask');if(m&&m.classList.contains('on'))renderSegList();
+    toast('已恢复该段');
+  });
+}
+/* 撤销恢复：事件放回 + 若为打卡段同步恢复勾选（与 delEvent 的 hab 联动对称） */
+function restoreEvent(d,ev){
+  var dd=day(d);
+  if(ev.hab){
+    if(ev.hab.indexOf('meal:')===0){ dd.meal=dd.meal||{}; dd.meal[ev.hab.slice(5)]={done:true,at:ev.s}; }
+    else if(ev.hab==='train'){ dd.workout=dd.workout||{}; dd.workout.train={done:true,s:ev.s,e:ev.e}; }
+    else if(ev.hab.indexOf('walk:')===0){ dd.workout=dd.workout||{}; dd.workout.walk=dd.workout.walk||{}; dd.workout.walk[ev.hab.slice(5)]={done:true}; }
+    else if(ev.hab.indexOf('commute:')===0){ dd.workout=dd.workout||{}; dd.workout.commute=dd.workout.commute||{}; dd.workout.commute[ev.hab.slice(8)]={done:true}; }
+  }
+  addEvent(d,ev);
 }
 
-/* 接着记 */
-function quickContinue(k){
-  if(!dayEditable(curDate)){toast(permLocked(curDate)?'该日期已锁定，无法补记':'想补这一天不可用');return;}
-  var d=curDate, start=lastEventEnd(d), isT=(d===todayStr());
-  var end=isT?minNow():1440;
-  if(start>=end){toast('已记到当前时间，等下一格再记');return;}
-  if(start<=0)start=0;
-  var gid=uid();
-  addEvent(d,{id:uid(),gid:gid,cat:k,s:start,e:end,t:'',plan:false});
-  if(k!=='.')S.cfg.lastCat=k;
-  save();renderRec();renderToday();renderStat();
-  showUndoBar('已接着记 '+hrs(end-start)+' · '+(CMAP[k]?CMAP[k].n:'未分类'),gid,d);
-}
 /* ===== Day Planner 日程视图（竖条长列：左分类色条-时间-分类名-备注）===== */
 function renderDayPlan(){
   var el=document.getElementById('dpTimeline'); if(!el)return;
@@ -2149,7 +2130,7 @@ function setPane(p){
   document.querySelectorAll('.nvb').forEach(function(b){b.classList.toggle('on',b.dataset.p===p)});
   if(p==='dayplan'){renderDayPlan();}
   if(p==='stat'){renderStat();renderGoals();renderWeek();renderCalendar();}
-  if(p==='set'){renderCatMgr();renderTextColorMgr();refreshCloudStat();renderGoalList();renderHabitSettings();document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);}
+  if(p==='set'){renderCatMgr();renderTextColorMgr();refreshCloudStat();renderGoalList();renderHabitSettings();}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 var _cb=null;
@@ -2189,7 +2170,6 @@ function storeInfo(){
 var DEFGOALS={1:12,2:45,3:10,4:7,5:4};
 function ensureCfg(){
   if(!S.cfg.goals)S.cfg.goals=JSON.parse(JSON.stringify(DEFGOALS));
-  if(S.cfg.notify===undefined)S.cfg.notify=false;
   if(!S.cfg.catColors||typeof S.cfg.catColors!=='object')S.cfg.catColors={};
   if(!S.cfg.textColors||typeof S.cfg.textColors!=='object')S.cfg.textColors={};
   ensureHabitCfg();
@@ -2219,61 +2199,6 @@ function renderGoalList(){
   document.getElementById('goalList').innerHTML=h;
 }
 function setGoal(k,v){S.cfg.goals=S.cfg.goals||{};S.cfg.goals[k]=Math.max(0,parseFloat(v)||0);save();renderGoals();}
-function toggleNotify(){
-  if(S.cfg.notify){S.cfg.notify=false;save();document.getElementById('notifySw').classList.remove('on');toast('已关闭系统通知');return;}
-  if(!('Notification' in window)){toast('当前浏览器不支持系统通知');return;}
-  Notification.requestPermission().then(function(p){S.cfg.notify=(p==='granted');save();document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);
-    if(S.cfg.notify){toast('已开启，到点会弹通知');checkReminders();}else toast('未授权，仍会在页面内提醒');});
-}
-function checkReminders(){
-  var d=todayStr(), evs=plansOf(d), arr=[];
-  evs.forEach(function(ev){ if(ev.s<=minNow())arr.push(ev); });
-  renderRemindBanner(arr,habitMissNow(d));
-  if(S.cfg.notify&&'Notification' in window&&Notification.permission==='granted'){
-    S.cfg.notified=S.cfg.notified||{};
-    arr.forEach(function(ev){var key=d+'#'+ev.gid;if(!S.cfg.notified[key]){S.cfg.notified[key]=1;save();
-      try{new Notification('时间到 · 该做啦',{body:fmtHM(ev.s)+' '+(catName(ev.cat))+(ev.t?(' · '+ev.t):'')});}catch(e){}}});
-  }
-}
-/* 到点还没打卡的提醒：时间已到且未勾的饮食 / 运动（训练看开始时间、步行看时间点）；通勤不提醒 */
-function habitMissNow(d){
-  var out=[];
-  ensureHabitCfg();
-  var nm=minNow(), m=habRead(d).meal;
-  mealPlan(d).forEach(function(x){
-    if(x.time<=nm&&!(m[x.id]&&m[x.id].done))out.push({txt:'「'+x.name+'」餐还没勾',go:'openMeal()'});
-  });
-  woItems(d).forEach(function(x){
-    if(!x.zilv)return;
-    var due=(x.type==='train')?x.s:x.min;
-    if(due!=null&&due<=nm&&!x.done)out.push({txt:'「'+x.short+'」还没做',go:'openWorkout()'});
-  });
-  return out;
-}
-function renderRemindBanner(arr,miss){
-  var el=document.getElementById('remindBanner');if(!el)return;
-  miss=miss||[];
-  if(!arr.length&&!miss.length){el.style.display='none';el.innerHTML='';return;}
-  var h='';
-  if(arr.length){
-    h+='<div class="remind"><div class="rtitle">⏰ 有 '+arr.length+' 项预备安排到时间了</div>';
-    arr.sort(function(a,b){return a.s-b.s}).forEach(function(ev){
-      h+='<div class="ritem"><span class="riic" style="background:'+catColor(ev.cat)+'"></span><span class="ritm">'+fmtHM(ev.s)+'</span>'+
-        '<span class="rinm"><b style="color:'+catColor(ev.cat)+'">'+esc(catName(ev.cat))+'</b>'+(ev.t?(' · '+esc(ev.t)):'')+'</span>'+
-        '<button class="btn sm pri" onclick="edToRecordById(\''+todayStr()+'\',\''+(ev.gid||ev.id)+'\')">转正式</button></div>';
-    });
-    h+='</div>';
-  }
-  if(miss.length){
-    h+='<div class="remind warn" style="margin-top:9px"><div class="rtitle">🍽 到点还没打卡（'+miss.length+' 项）</div>';
-    miss.forEach(function(x){
-      h+='<div class="ritem"><span class="riic" style="background:#E8943A"></span><span class="rinm"><b style="color:#8a4d14">'+esc(x.txt)+'</b></span>'+
-        '<button class="btn sm pri" onclick="'+x.go+'">去打卡</button></div>';
-    });
-    h+='</div>';
-  }
-  el.innerHTML=h;el.style.display='block';
-}
 function edToRecordById(d,gid){
   var ev=eventsOf(d).filter(function(e){return (e.gid||e.id)===gid;})[0];
   if(!ev)return;
@@ -2944,10 +2869,9 @@ function resetHabitDefaults(){
 /* ===== 启动 ===== */
 load();ensureCfg();applyTextColors();
 document.getElementById('wxSw').classList.toggle('on',S.cfg.autoWx!==false);
-document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);
 document.getElementById('todayModal').onclick=function(e){if(e.target===this)closeToday()};
-renderRec();renderToday();renderIdeas();renderCatMgr();storeInfo();refreshCloudStat();renderGoalList();renderGoals();checkReminders();renderCalendar();setSV('day');
-setInterval(function(){if(curDate===todayStr()){renderTimeline();renderDayPlan();renderToday();checkReminders();
+renderRec();renderToday();renderIdeas();renderCatMgr();storeInfo();refreshCloudStat();renderGoalList();renderGoals();renderCalendar();setSV('day');
+setInterval(function(){if(curDate===todayStr()){renderTimeline();renderDayPlan();renderToday();
   var wp=document.getElementById('p-stat');if(wp&&wp.classList.contains('on'))renderWeek();}},60000);
 </script>
 </body>
