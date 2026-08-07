@@ -245,27 +245,6 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .goalrow .gv{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:11px;color:var(--tx2);font-variant-numeric:tabular-nums}
 .goalrow .gv.over{color:var(--tx);font-weight:600}
 .goalrow input.gval{width:56px;min-height:34px;padding:5px 7px;border:1px solid var(--line2);border-radius:8px;text-align:center;font-size:13px}
-/* ===== 作息模板编辑器（时间轴样式）===== */
-.tplchips{display:flex;gap:7px;flex-wrap:wrap}
-.tplchip{padding:7px 13px;border:1px solid var(--line2);background:#fff;border-radius:18px;font-size:13px;font-weight:500;color:var(--tx2);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.12s}
-.tplchip:active{transform:scale(.97)}
-.tplchip.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.tplgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px 6px;margin-top:12px;max-width:880px;margin-left:auto;margin-right:auto}
-.tplgrid .hblock{min-height:96px}
-.tplgrid .hbody{flex:1;display:flex;flex-direction:column;min-height:0}
-.tplgrid .hslot{flex:1;position:relative;cursor:pointer;background:var(--empn)}
-.tplgrid .hslot.empty{background:var(--empn)}
-.tplgrid .hslot .hfill{position:absolute;inset:0}
-.tplgrid .hslot .tlab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;padding:0 3px;text-align:center;line-height:1.15;pointer-events:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.tplgrid .hslot.plan .hfill{box-sizing:border-box}
-@media(max-width:768px){
-.tplgrid{grid-template-columns:repeat(4,1fr);gap:6px 5px}
-.tplgrid .hblock{min-height:86px}
-.tplgrid .hslot .tlab{font-size:10px}
-}
-.tpllegend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--tx3)}
-.tpllegend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}
-.tplbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 /* 月历：统计页快速跳转 */
 .calhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .calhead span{flex:1;font-weight:700;font-size:14px;text-align:center}
@@ -358,7 +337,7 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .recbar .hd-right{margin-left:0;width:100%;gap:10px}
 .recbar .hd-right .btn.rec{flex:1}
 .hd-big{font-size:20px}
-.dpwrap,.wkwrap,.daygrid,.tplgrid{max-width:100%;margin-left:0;margin-right:0}
+.dpwrap,.wkwrap,.daygrid{max-width:100%;margin-left:0;margin-right:0}
 .daygrid{grid-template-columns:repeat(4,1fr);gap:6px 5px}
 .hblock{min-height:56px;border-radius:12px}
 .hhour{font-size:11px}
@@ -366,14 +345,14 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .moodbar{flex-wrap:wrap}
 .dphead,.recHead{flex-direction:column;align-items:stretch;gap:10px}
 /* 点按目标 ≥44px（--tap） */
-.btn,.btn.sm,.cp,.dtab,.dp,.chip,.rc,.rtag,.qtime,.tplchip,.moodchip,.seg{min-height:var(--tap)}
+.btn,.btn.sm,.cp,.dtab,.dp,.chip,.rc,.rtag,.qtime,.moodchip,.seg{min-height:var(--tap)}
 .dnav{width:var(--tap);height:var(--tap)}
 .btn.sm{padding:0 14px;font-size:13px}
 .rtag,.qtime{display:inline-flex;align-items:center;padding:0 15px}
 .rc,.chip{display:inline-flex;align-items:center;padding:0 14px}
 .seg{font-size:13.5px}
 .del{width:36px;height:36px}
-.wf,.rectools,.tplbar,.recent,.catpick,.durpick,.qtimebar,.rtagrow,.tplchips{gap:10px}
+.wf,.rectools,.recent,.catpick,.durpick,.qtimebar,.rtagrow{gap:10px}
 /* 字阶下限：正文 14 / 次要 12 / 标签 11 */
 body{font-size:14px}
 .mut3,.dlcard .dx,.pt-note,.qhint{font-size:12px}
@@ -410,6 +389,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 .zilv.on{background:rgba(31,169,113,.10);border-color:rgba(31,169,113,.38);color:#1FA971}
 .zilv.fire{border-color:#F3CC4F;color:#B85C1E}
 .zilvtip{font-size:11.5px;color:var(--tx3);flex:1;min-width:120px}
+.zilvtip.warn{color:#C0392B;font-weight:600}
 .habitrow{display:flex;gap:10px;align-items:stretch}
 .hbcard{flex:1;min-width:0;margin-bottom:0;cursor:pointer;transition:box-shadow .15s,transform .12s}
 .hbcard:hover{box-shadow:0 2px 10px rgba(10,37,64,.07)}
@@ -498,13 +478,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <div class="hd-right">
       <button class="btn sm" onclick="openSearch()" title="搜索历史记录">🔍</button>
       <div class="tdbadge" id="tdBadge" onclick="openToday()"><span class="tdn" id="tdNum">0</span><span class="tdl">待处理</span></div>
-      <button class="btn pri rec" onclick="recNow()">记现在</button>
     </div>
-  </div>
-  <div class="rectools">
-    <select id="tplPick" class="in sm" style="width:auto;min-width:108px;flex:none" onchange="S.cfg.curTpl=+this.value;save();updateApplyLbl()"></select>
-    <button class="btn sm pri" onclick="applyTemplate(S.cfg.curTpl,curDate)">🗓 套用到今天</button>
-    <span class="mut3">把模板一键铺到「<span id="applyDayLbl"></span>」（过去变记录、未来变计划）</span>
   </div>
   <div id="remindBanner" style="display:none"></div>
   <div id="lockNote" class="hint" style="display:none"></div>
@@ -660,22 +634,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
     <p class="mut3" style="margin-top:8px;font-size:12px">天气会自动获取当前地区并保存到当天，无需手动填写。统计页日/周/年视图都会展示当天天气。</p>
   </div>
   <div class="card">
-    <h2>作息模板</h2>
-    <p class="mut3" style="margin-top:4px">用时间轴规划当天作息（0:00–24:00，3 行 × 8 格）。点任意格子设置分类和内容，可保存多套（如「工作日」「周末」），记录页一键套用。</p>
-    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <input id="tplName" class="in" style="flex:1;min-width:130px" placeholder="模板名称，如 工作日" oninput="tplRename(this.value)">
-      <button class="btn sm" onclick="newTemplate()">+ 新建</button>
-      <button class="btn sm dan" onclick="delTemplate()">删除</button>
-    </div>
-    <div id="tplChips" class="tplchips" style="margin-top:10px"></div>
-    <div id="tplTimeline" class="tplgrid" style="margin-top:12px"></div>
-    <div class="tpllegend"><span><i style="background:var(--empn)"></i>空格子（点它填）</span><span style="color:var(--tx3)">点任意格子即可编辑该时段</span></div>
-    <div class="tplbar">
-      <button class="btn pri" onclick="applyTemplate(S.cfg.curTpl,todayStr())">套用到今天</button>
-      <button class="btn" onclick="resetTplDay()">清空本模板</button>
-    </div>
-  </div>
-  <div class="card">
     <h2>时间目标（每周）</h2>
     <p class="mut3" style="margin-top:4px">设置每类活动的周目标小时数，统计页「本周目标」会对比实际进度。</p>
     <div id="goalList" style="margin-top:10px"></div>
@@ -740,7 +698,7 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
       2. <b>点任意胶囊</b>：弹窗里能看本小时已填的段，并手动填开始/结束的「几点几分」（默认整点，分钟你自己改）。分类一键选<br>
       3. 一个胶囊可填多段（如 14:00–14:20 工作、14:20–14:30 学习），各段按自己的时间位置各占一截<br>
       4. 吃饭 / 日常选「吃饭 / 日常」分类——看得见，但不算进 学习/工作/娱乐/运动/社交 五类占比<br>
-      5. <b>记现在</b>：顶部按钮，自动按上一次用的分类从上次结束续到当前；想换分类就点时间胶囊手动选<br>
+      5. <b>饮食 / 运动打卡</b>：点卡片里的项打勾，自动在对应时间生成记录段；打满即亮「今日自律」<br>
       6. 昨天默认能补；手机上：浏览器打开 → 分享 → 添加到主屏幕<br>
       7. <b>云同步</b>：设置里填一次 GitHub 令牌，点「☁️ 同步到云端」上传；换设备填同一个令牌、点一次同步即可拉取共用
     </div>
@@ -810,29 +768,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
   </div>
 </div></div>
 
-<div class="mask" id="tplMask"><div class="sheetm">
-  <div class="row"><h2 id="tplEdTitle">设置时段</h2><div class="sp"></div>
-    <button class="del" onclick="closeTpl()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-  <div style="margin-top:12px"><label class="mut3">时间段</label>
-    <div class="tmrow">
-      <span class="tmto">从</span>
-      <div class="tmbox"><span class="tmv" id="tplFrom">00:00</span></div>
-      <span class="tmto">到</span>
-      <div class="tmbox"><button class="tmb" onclick="tplStepTo(-1)">−</button><span class="tmv" id="tplTo">00:30</span><button class="tmb" onclick="tplStepTo(1)">+</button></div>
-    </div>
-    <div class="mut3" style="margin-top:4px;font-size:12px">点「+ / −」调整结束时间</div>
-  </div>
-  <div style="margin-top:14px"><label class="mut3">分类</label>
-    <div class="catpick" id="tplCats" style="margin-top:6px"></div></div>
-  <div class="fld" style="margin-top:14px"><label>这段在做什么</label>
-    <input type="text" id="tplText" placeholder="如 洗漱 / 骑车通勤 / 午餐"></div>
-  <div class="row" style="margin-top:16px;gap:8px">
-    <button class="btn dan" onclick="delTplSeg()">删除</button><div class="sp"></div>
-    <button class="btn" onclick="closeTpl()">取消</button>
-    <button class="btn pri" onclick="saveTplSeg()">保存</button>
-  </div>
-</div></div>
-
 <div class="mask" id="moodMask"><div class="sheetm">
   <div class="row"><h2>记心情</h2><div class="sp"></div><button class="del" onclick="closeMood()">✕</button></div>
   <p class="mut3" style="margin-top:8px">一句话，或一个表情，每天记一次——今晚回头看，就知道这天过得怎么样</p>
@@ -883,18 +818,20 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 
 <div class="mask mid" id="mask"><div class="modal">
   <h2 id="mkTitle"></h2><p id="mkBody"></p>
-  <div class="row" style="justify-content:flex-end;gap:8px">
+  <div class="fld" id="mkInputWrap" style="display:none;margin-top:12px"><label class="mut3">输入「<b id="mkWord">清空</b>」确认，此操作不可撤销</label>
+    <input type="text" id="mkInput" autocomplete="off" style="margin-top:6px"></div>
+  <div class="row" style="justify-content:flex-end;gap:8px;margin-top:4px">
     <button class="btn" onclick="closeMask()">取消</button>
-    <button class="btn dan" id="mkOk">确认</button></div>
+    <button class="btn dan" id="mkOk" disabled>确认</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
 <div class="undobar" id="undoBar"><span id="undoMsg"></span><button onclick="undoQuick()">撤销</button></div>
 
 <script>
 var LS='wb_t24_';
-var DEFCATS=[{k:'1',n:'学习',c:'#529DCB'},{k:'2',n:'工作',c:'#D46934'},{k:'3',n:'娱乐',c:'#9B59B6'},
+var DEFCATS=[{k:'1',n:'学习',c:'#529DCB'},{k:'2',n:'工作',c:'#D46934'},{k:'3',n:'娱乐',c:'#35A7C4'},
 {k:'4',n:'运动',c:'#71BF50'},{k:'5',n:'社交',c:'#E86FB5'}];
-var CAT_VER=2;  /* 分类色板版本：调整 DEFCATS 默认色后 +1，触发一次性覆盖（保留用户自定义分类名/增删） */
+var CAT_VER=3;  /* 分类色板版本：调整 DEFCATS 默认色后 +1，触发一次性覆盖（保留用户自定义分类名/增删） */
 var DAILY={k:'D',n:'日常',c:'#7E8CA1'};
 var EAT={k:'E',n:'吃饭',c:'#E8943A'};
 var PAL=['#529DCB','#D46934','#F3CC4F','#71BF50','#ECA063','#4A6FA5','#B85C1E','#C9A227'];
@@ -1219,7 +1156,6 @@ function renderRec(){
   renderPlanList();
   updateDayTabs();
   maybeFetchWeather();
-  updateApplyLbl();
   checkReminders();
   renderDayPlan();
   renderMealCard();renderWorkoutCard();renderHabits();renderZilv();
@@ -1227,7 +1163,6 @@ function renderRec(){
 function applyDayLight(){
   document.getElementById('curDate').textContent=fullDate(curDate);
   document.getElementById('curWeek').textContent=wk(curDate);
-  var adl=document.getElementById('applyDayLbl');if(adl)adl.textContent=(curDate===todayStr()?'今天':cnDate(curDate));
   renderWxAuto();
   var ln=document.getElementById('lockNote');
   if(permLocked(curDate)){ln.style.display='block';ln.textContent='这一天已超过补记窗口（仅今天和昨天可改），永久只读。';}
@@ -1394,7 +1329,6 @@ function lastEventEnd(d){ var m=0; recordsOf(d).forEach(function(e){ if(e.e>m)m=
 function setViewDay(off){curDate=addD(todayStr(),off);renderRec();renderDayPlan();}
 function updateDayTabs(){var off=diffD(curDate,todayStr());document.querySelectorAll('#dayTabs .dtab, #dpTabs .dtab').forEach(function(b){b.classList.toggle('on',+b.dataset.d===off)});}
 function goToday(){curDate=todayStr();renderRec();updateDayTabs();}
-function recNow(){goToday(); if(S.cfg.lastCat) quickContinue(S.cfg.lastCat); else openCapsule(curDate,Math.floor(minNow()/60),null);}
 function openToday(){document.getElementById('todayModal').classList.add('on')}
 function closeToday(){document.getElementById('todayModal').classList.remove('on')}
 
@@ -1414,7 +1348,7 @@ function openCapsule(d,hour,evId,startMin){
   document.getElementById('edText').value = evId? ((eventsOf(d).filter(function(e){return (e.gid||e.id)===evId;})[0]||{}).t||'') : '';
   document.getElementById('edPlanHint').style.display = edPlan? 'block':'none';
   document.getElementById('edToRecord').style.display = (edPlan && !editableEv(d,sMin))? 'none' : (edPlan? 'inline-flex':'none');
-  document.getElementById('edTitle').textContent = edPlan? '预备安排（计划）' : (evId? '编辑这段':'记录 / 新增一段');
+  document.getElementById('edTitle').textContent = edPlan? '预备安排（计划）' : (evId? '编辑这段':'新增一段记录');
   renderEdCats(); renderRecentTags(); refreshQuickTimes(); renderSegList();
   document.getElementById('editMask').classList.add('on');
 }
@@ -1460,7 +1394,7 @@ function renderSegList(){
   var merged=mergeContinuousSegments(evs);
   var lo=(typeof edHour==='number')?edHour*60:-1, hi=lo+60;
   var list=(lo<0)?merged:merged.filter(function(ev){return ev.s<hi && ev.e>lo;});
-  if(!list.length){box.innerHTML='<div class="mut3" style="padding:10px;font-size:12px">当前时间未落在任何已记录段内</div>';return;}
+  if(!list.length){box.innerHTML='<div class="mut3" style="padding:10px;font-size:12px">这个时段还没有记录，直接填开始/结束时间即可</div>';return;}
   box.innerHTML=list.map(function(ev){
     var cat=CMAP[ev.cat]||DAILY||EAT;
     var rng=fmtHM(ev.s)+'-'+fmtHM(ev.e%1440);
@@ -2098,7 +2032,7 @@ function resetCatColors(){
   toast('已恢复默认分类颜色');
 }
 function refreshColorViews(){
-  renderCatMgr();renderRec();renderStat();renderToday();renderTplEditor();renderGoalList();renderDayPlan();
+  renderCatMgr();renderRec();renderStat();renderToday();renderGoalList();renderDayPlan();
 }
 function addCat(){
   var n=document.getElementById('newCat').value.trim();
@@ -2200,7 +2134,7 @@ function clearAll(){
     ['days','ideas','posts','cats','cfg'].forEach(function(k){localStorage.removeItem(LS+k)});
     S={days:{},ideas:[],posts:[],cats:null,cfg:{}};loadCats();migrateAll();
     ['tx','tx2','tx3'].forEach(function(k){document.documentElement.style.removeProperty('--'+k)});
-    renderAll();toast('已全部清空')});
+    renderAll();toast('已全部清空')},'清空');
 }
 
 /* ===== UI ===== */
@@ -2209,14 +2143,27 @@ function setPane(p){
   document.querySelectorAll('.nvb').forEach(function(b){b.classList.toggle('on',b.dataset.p===p)});
   if(p==='dayplan'){renderDayPlan();}
   if(p==='stat'){renderStat();renderGoals();renderWeek();renderCalendar();}
-  if(p==='set'){renderCatMgr();renderTextColorMgr();refreshCloudStat();renderTplEditor();renderGoalList();renderHabitSettings();document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);}
+  if(p==='set'){renderCatMgr();renderTextColorMgr();refreshCloudStat();renderGoalList();renderHabitSettings();document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 var _cb=null;
-function confirmMask(t,b,cb){document.getElementById('mkTitle').textContent=t;document.getElementById('mkBody').textContent=b;
-  _cb=cb;document.getElementById('mask').classList.add('on')}
+/* confirmMask(t,b,cb[,word])：word 传入时须输入该词才能点「确认」（防误触，如清空数据） */
+function confirmMask(t,b,cb,word){
+  document.getElementById('mkTitle').textContent=t;
+  document.getElementById('mkBody').textContent=b;
+  var wrap=document.getElementById('mkInputWrap'), inp=document.getElementById('mkInput'), ok=document.getElementById('mkOk');
+  if(word){
+    wrap.style.display='block';
+    document.getElementById('mkWord').textContent=word;
+    inp.value=''; ok.disabled=true;
+    inp.oninput=function(){ok.disabled=(inp.value.trim()!==word);};
+  }else{
+    wrap.style.display='none'; inp.oninput=null; ok.disabled=false;
+  }
+  _cb=cb;document.getElementById('mask').classList.add('on');
+}
 function closeMask(){document.getElementById('mask').classList.remove('on');_cb=null}
-document.getElementById('mkOk').onclick=function(){var c=_cb;closeMask();if(c)c()};
+document.getElementById('mkOk').onclick=function(){if(this.disabled)return;var c=_cb;closeMask();if(c)c()};
 document.getElementById('mask').onclick=function(e){if(e.target===this)closeMask()};
 document.getElementById('editMask').onclick=function(e){if(e.target===this)closeEdit()};
 var edH1=document.getElementById('edH1'),edM1=document.getElementById('edM1'),edH2=document.getElementById('edH2'),edM2=document.getElementById('edM2'),edDurLab=document.getElementById('edDurLab');
@@ -2232,169 +2179,15 @@ function storeInfo(){
   if(wn)wn.style.display=(n>0.8*5000*1024)?'block':'none';
 }
 
-/* ===== 作息模板 / 目标 / 提醒 ===== */
-var TPL_SLOTS=48;   /* 模板只规划当天 24 小时（48 个半小时槽），与时间轴同步 */
-var DEFROUTINE=[
- {a:20,e:21,k:'4',t:'走路'},
- {a:21,e:23,k:'D',t:'洗漱早餐'},
- {a:23,e:30,k:'4',t:'骑车通勤'},
- {a:30,e:31,k:'E',t:'午餐'},
- {a:31,e:32,k:'4',t:'走路'},
- {a:32,e:42,k:'2',t:'工作'},
- {a:42,e:43,k:'4',t:'骑车回家'},
- {a:43,e:45,k:'E',t:'晚餐'},
- {a:45,e:48,k:'1',t:'学习'},
- {a:48,e:54,k:'3',t:'娱乐'}
-];
+/* ===== 目标 / 提醒 ===== */
 var DEFGOALS={1:12,2:45,3:10,4:7,5:4};
 function ensureCfg(){
-  var isFresh=!S.cfg.templates;
-  if(isFresh){
-    var base=S.cfg.routine?S.cfg.routine:DEFROUTINE;
-    S.cfg.templates=[{name:'工作日',segs:base.map(function(x){return {a:x.a,e:x.e,k:x.k,t:x.t}})}];
-    delete S.cfg.routine;
-    S.cfg.tplMigrated=1;
-  }
-  if(S.cfg.curTpl===undefined||S.cfg.curTpl<0)S.cfg.curTpl=0;
-  if(S.cfg.curTpl>=S.cfg.templates.length)S.cfg.curTpl=0;
-  if(!S.cfg.tplMigrated){
-    S.cfg.templates.forEach(function(tp){
-      tp.segs=(tp.segs||[]).map(function(s){
-        var a=Math.max(0,Math.min(TPL_SLOTS-1,s.a+6)), e=Math.max(0,Math.min(TPL_SLOTS,s.e+6));
-        return {a:a,e:e,k:s.k,t:s.t};
-      });
-    });
-    S.cfg.tplMigrated=1;
-  }
   if(!S.cfg.goals)S.cfg.goals=JSON.parse(JSON.stringify(DEFGOALS));
   if(S.cfg.notify===undefined)S.cfg.notify=false;
   if(!S.cfg.catColors||typeof S.cfg.catColors!=='object')S.cfg.catColors={};
   if(!S.cfg.textColors||typeof S.cfg.textColors!=='object')S.cfg.textColors={};
   ensureHabitCfg();
   save();
-}
-function getTpl(){return S.cfg.templates[S.cfg.curTpl];}
-function segAt(segs,s){for(var i=0;i<segs.length;i++){if(s>=segs[i].a&&s<segs[i].e)return segs[i];}return null;}
-function tplSlotInfo(s){
-  var baseH=0, h=(s%48)/2;          /* 模板只规划当天 0:00-24:00 */
-  var dayIdx=0, dayLabel='今天';
-  var slotInDay=s%48;
-  return {h:Math.floor(h),dayIdx:dayIdx,dayLabel:dayLabel,slotInDay:slotInDay};
-}
-function tplSlotLab(s){
-  var info=tplSlotInfo(s), hh=info.h, mm=(s%2)*30;
-  return pad(hh)+':'+pad(mm);
-}
-function tplRangeLab(a,b){
-  return tplSlotLab(a)+' – '+tplSlotLab(b).replace(/^(昨天|今天|明天) /,'');
-}
-function renderTplEditor(){
-  if(!S.cfg.templates||!S.cfg.templates.length){S.cfg.templates=[{name:'新模板',segs:[]}];S.cfg.curTpl=0;}
-  if(S.cfg.curTpl>=S.cfg.templates.length)S.cfg.curTpl=0;
-  var tp=getTpl();
-  var ni=document.getElementById('tplName'); if(ni)ni.value=tp.name||'';
-  renderTplChips();renderTplTimeline();renderTplPick();
-}
-function renderTplChips(){
-  var h='';S.cfg.templates.forEach(function(tp,i){
-    h+='<button class="tplchip'+(i===S.cfg.curTpl?' on':'')+'" onclick="switchTpl('+i+')">'+esc(tp.name||('模板'+(i+1)))+'</button>';
-  });
-  document.getElementById('tplChips').innerHTML=h;
-}
-function switchTpl(i){S.cfg.curTpl=i;save();renderTplEditor();}
-function tplRename(v){var tp=getTpl();tp.name=v;save();renderTplChips();renderTplPick();}
-function newTemplate(){
-  /* 默认按今天饮食方案预填 3 餐（与记录页早/中/晚同步） */
-  ensureHabitCfg();
-  var w=wdKey(todayStr()), pl=S.cfg.diet[w]||[];
-  var segs=pl.map(function(m){return {a:Math.floor(m.time/30),e:Math.ceil((m.time+(m.dur||MEAL_DUR))/30),k:'E',t:m.name};});
-  S.cfg.templates.push({name:'新模板 '+(S.cfg.templates.length+1),segs:segs});
-  S.cfg.curTpl=S.cfg.templates.length-1;save();renderTplEditor();toast('已按今天饮食方案预填 '+(segs.length||0)+' 段');
-}
-function delTemplate(){
-  if(S.cfg.templates.length<=1){toast('至少保留一个模板');return;}
-  S.cfg.templates.splice(S.cfg.curTpl,1);
-  if(S.cfg.curTpl>=S.cfg.templates.length)S.cfg.curTpl=S.cfg.templates.length-1;
-  save();renderTplEditor();toast('已删除该模板');
-}
-function resetTplDay(){var tp=getTpl();tp.segs=[];save();renderTplTimeline();toast('本模板已清空，从头规划');}
-function renderTplTimeline(){
-  var tp=getTpl(), segs=tp.segs||[], el=document.getElementById('tplTimeline'), h='';
-  for(var k=0;k<24;k++){
-    var s=k*2, info=tplSlotInfo(s), hh=info.h, isDayStart=(hh===0);
-    h+='<div class="hblock'+(isDayStart?' daystart':'')+'">';
-    h+='<div class="hhour">'+(hh<10?'0'+hh:hh)+':00</div>';
-    h+='<div class="hbody">';
-    [s,s+1].forEach(function(slot){
-      var seg=segAt(segs,slot), cat=seg?(CMAP[seg.k]||DAILY||EAT):null, col=cat?catColor(seg.k):'', fill=cat?'background:'+col:'', cls=seg?'':' empty', lbl=seg?(seg.t||(cat?cat.n:'')):'';
-      h+='<div class="hslot'+cls+'" data-slot="'+slot+'" onclick="tplTap('+slot+')"><div class="hfill" style="'+fill+'"></div>'+(lbl?'<span class="tlab" style="color:'+(cat?txtOn(col):'var(--tx2)')+'">'+esc(lbl)+'</span>':'')+'</div>';
-    });
-    h+='</div></div>';
-  }
-  el.innerHTML=h;
-}
-function tplTap(s){
-  var tp=getTpl(), seg=segAt(tp.segs,s);
-  tplEdSeg=seg; tplA=seg?seg.a:s; tplB=seg?(seg.e):(s+1); tplEdCat=seg?seg.k:'D';
-  renderTplCats();
-  document.getElementById('tplFrom').textContent=tplSlotLab(tplA);
-  document.getElementById('tplTo').textContent=tplSlotLab(tplB);
-  document.getElementById('tplText').value=seg?(seg.t||''):'';
-  document.getElementById('tplEdTitle').textContent=seg?'编辑时段':'新增时段';
-  document.getElementById('tplMask').classList.add('on');
-}
-function renderTplCats(){
-  var h='';CATS.concat([DAILY,EAT]).forEach(function(c){
-    h+='<button class="cp'+(tplEdCat===c.k?' on':'')+'" onclick="tplEdCat=\''+c.k+'\';renderTplCats()"><i style="background:'+catColor(c.k)+'"></i>'+esc(c.n)+'</button>';
-  });
-  h+='<button class="cp'+(tplEdCat==='.'?' on':'')+'" onclick="tplEdCat=\'.\';renderTplCats()"><i style="background:var(--empn);border:1px solid var(--line2)"></i>不分类</button>';
-  document.getElementById('tplCats').innerHTML=h;
-}
-function tplStepTo(n){
-  tplB+=n; if(tplB<tplA+1)tplB=tplA+1; if(tplB>TPL_SLOTS)tplB=TPL_SLOTS;
-  document.getElementById('tplTo').textContent=tplSlotLab(tplB);
-}
-function saveTplSeg(){
-  var tp=getTpl(); tp.segs=tp.segs||[];
-  var cat=tplEdCat, txt=document.getElementById('tplText').value.trim();
-  tp.segs=tp.segs.filter(function(s){return (s.e<=tplA)||(s.a>=tplB);});
-  tp.segs.push({a:tplA,e:tplB,k:cat,t:tplEdIsNew?txt:(txt||'')});
-  tp.segs.sort(function(x,y){return x.a-y.a;});
-  save();closeTpl();renderTplTimeline();toast('已保存时段');
-}
-function delTplSeg(){
-  if(tplEdSeg){var tp=getTpl();tp.segs=tp.segs.filter(function(s){return s!==tplEdSeg;});save();}
-  closeTpl();renderTplTimeline();
-}
-function closeTpl(){var m=document.getElementById('tplMask');if(m)m.classList.remove('on');}
-var tplA=0,tplB=1,tplEdSeg=null,tplEdIsNew=false,tplEdCat='D';
-function renderTplPick(){
-  var sel=document.getElementById('tplPick'); if(!sel)return;
-  var h='';S.cfg.templates.forEach(function(tp,i){h+='<option value="'+i+'"'+(i===S.cfg.curTpl?' selected':'')+'>'+esc(tp.name||('模板'+(i+1)))+'</option>';});
-  sel.innerHTML=h; updateApplyLbl();
-}
-function updateApplyLbl(){var el=document.getElementById('applyDayLbl'); if(el)el.textContent=(curDate===todayStr()?'今天':cnDate(curDate));}
-function applyTemplate(idx,d){
-  var tp=S.cfg.templates[idx]; if(!tp||!tp.segs||!tp.segs.length){toast('先在设置里配置作息模板');setPane('set');return;}
-  var segs=tp.segs, nm=(d===todayStr())?minNow():1440;
-  var counts={rec:0,plan:0,skip:0};
-  segs.forEach(function(seg){
-    for(var slot=seg.a;slot<seg.e;slot++){
-      var info=tplSlotInfo(slot);
-      var tD=d, mi=info.slotInDay*30;   /* 模板只映射目标日当天（24h 窗口，dayIdx 恒 0） */
-      var toEv = function(cat,txt,plan){
-        var overlap=recordsOf(tD).some(function(e){return Math.max(e.s,mi)<Math.min(e.e,mi+30);});
-        var planOverlap=((S.days[tD]&&S.days[tD].ev)||[]).some(function(e){return e.plan&&Math.max(e.s,mi)<Math.min(e.e,mi+30);});
-        if((overlap)||planOverlap){counts.skip++;return;}
-        var isPast=(tD===todayStr())?(mi+30<=nm):(diffD(todayStr(),tD)>0);
-        if(isPast){ addEvent(tD,{id:uid(),gid:uid(),cat:cat,s:mi,e:mi+30,t:txt,plan:false}); counts.rec++; }
-        else { addEvent(tD,{id:uid(),gid:uid(),cat:cat,s:mi,e:mi+30,t:txt,plan:true}); counts.plan++; }
-      };
-      toEv(seg.k, seg.t||'', false);
-    }
-  });
-  save();renderRec();renderToday();renderStat();
-  toast('已套用「'+tp.name+'」：'+counts.rec+' 段记录 + '+counts.plan+' 段计划'+(counts.skip?('（'+counts.skip+' 段已有，跳过）'):''));
 }
 function weekDays(){var t=new Date(),dw=(t.getDay()+6)%7;var st=new Date(t);st.setDate(t.getDate()-dw);var out=[];for(var i=0;i<7;i++)out.push(ymd(new Date(st.getFullYear(),st.getMonth(),st.getDate()+i)));return out}
 function renderGoals(){
@@ -3031,7 +2824,7 @@ function renderZilv(){
   var ok=zilvOk(curDate), n=zilvStreak(), miss=zilvMiss(curDate);
   var h='<span class="zilv'+(ok?' on':'')+'">'+(ok?'今日自律 ✓':'今日自律 · 未达成')+'</span>';
   if(n>0)h+='<span class="zilv fire">连续自律 '+n+' 天 🔥</span>';
-  h+='<span class="zilvtip">'+(ok?'饮食吃齐、该练的练了、三次步行都走了':
+  h+='<span class="zilvtip'+(ok?'':' warn')+'">'+(ok?'饮食吃齐、该练的练了、三次步行都走了':
       (miss.length?('还差：'+esc(miss.join(' / '))):'今天还没安排饮食和运动'))+'</span>';
   el.innerHTML=h;
 }
@@ -3169,7 +2962,7 @@ load();ensureCfg();applyTextColors();
 document.getElementById('wxSw').classList.toggle('on',S.cfg.autoWx!==false);
 document.getElementById('notifySw').classList.toggle('on',S.cfg.notify);
 document.getElementById('todayModal').onclick=function(e){if(e.target===this)closeToday()};
-renderRec();renderToday();renderIdeas();renderCatMgr();storeInfo();refreshCloudStat();renderTplEditor();renderGoalList();renderGoals();checkReminders();renderCalendar();setSV('day');
+renderRec();renderToday();renderIdeas();renderCatMgr();storeInfo();refreshCloudStat();renderGoalList();renderGoals();checkReminders();renderCalendar();setSV('day');
 setInterval(function(){if(curDate===todayStr()){renderTimeline();renderDayPlan();renderToday();checkReminders();
   var wp=document.getElementById('p-stat');if(wp&&wp.classList.contains('on'))renderWeek();}},60000);
 </script>
