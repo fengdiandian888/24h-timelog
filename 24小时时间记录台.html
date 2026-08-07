@@ -179,7 +179,6 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 /* ===== 胶囊时间轴（整点小时块，无刻度线，同块多段渐变）===== */
 .daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:3px 3px}
 .hblock{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:60px;cursor:pointer;transition:box-shadow .15s}
-.hblock.night{background:var(--empn)}
 .hblock.nowcap{box-shadow:0 0 0 2.5px var(--tx2)}
 .hblock:active{transform:scale(.985)}
 .hfill{position:absolute;left:0;top:0;right:0;bottom:0;z-index:0}
@@ -187,7 +186,6 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .hrec{position:absolute;left:0;right:0;z-index:1;border-radius:0}
 .hhour{position:relative;z-index:6;font-size:12.5px;color:var(--tx);font-weight:700;text-align:center;padding:5px 0 4px}
 .hblock.filled .hhour{font-weight:700;padding:2px 0;margin:3px auto 0}
-.hblock.night .hhour{color:var(--tx2)}
 .hday{display:none}   /* 胶囊不再显示 昨天/今天/明天 日期标签 */
 /* 计划块：与记录段同为「上下纵向」——用 top/height 定位，左右满宽内缩 3px */
 .hplan{position:absolute;left:0;right:0;z-index:2;border:1.5px dashed;border-radius:0;box-sizing:border-box}
@@ -1235,7 +1233,6 @@ function renderTimeline(){
   for(var k=0;k<totalH;k++){
     var dt=new Date(baseMs+k*3600000);
     var d=ymd(dt), hh=dt.getHours();
-    var night=(hh>=22||hh<=5);
     var base=hh*60;
     var parts=mergeParts(evOverlap(d,base,base+60));
     var isNowCap=(t===todayStr() && d===t && hh===Math.floor(nm/60));
@@ -1248,7 +1245,7 @@ function renderTimeline(){
     parts.forEach(function(p){
       rch+='<div class="hrec" style="top:'+(p.p0*100).toFixed(2)+'%;height:'+((p.p1-p.p0)*100).toFixed(2)+'%;background:'+p.color+'"></div>';
     });
-    h+='<div class="hblock'+(night?' night':'')+(parts.length?' filled':'')+(isNowCap?' nowcap':'')+'" data-d="'+d+'" data-h="'+hh+'" onclick="tapCapsule(\''+d+'\','+hh+')">';
+    h+='<div class="hblock'+(parts.length?' filled':'')+(isNowCap?' nowcap':'')+'" data-d="'+d+'" data-h="'+hh+'" onclick="tapCapsule(\''+d+'\','+hh+')">';
     h+='<div class="hfill"></div>'+rch+plh;
     /* 时间文字在胶囊顶部 → 取「真正压在文字下面那一段」的颜色算对比色（记录优先，其次计划）；
        顶部为空则保持默认深色，避免白字压白底看不见 */
