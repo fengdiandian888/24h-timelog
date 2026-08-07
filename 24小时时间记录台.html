@@ -177,20 +177,20 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .undobar button{color:#fff;background:rgba(255,255,255,.2);border-radius:18px;padding:6px 16px;font-size:13px;font-weight:600;white-space:nowrap}
 .undobar button:active{background:rgba(255,255,255,.34)}
 /* ===== 胶囊时间轴（整点小时块，无刻度线，同块多段渐变）===== */
-.daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:7px 6px}
+.daygrid{margin-top:10px;max-width:880px;margin-left:auto;margin-right:auto;display:grid;grid-template-columns:repeat(8,1fr);gap:3px 3px}
 .hblock{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:60px;cursor:pointer;transition:box-shadow .15s}
 .hblock.night{background:var(--empn)}
 .hblock.nowcap{box-shadow:0 0 0 2.5px var(--tx2)}
 .hblock:active{transform:scale(.985)}
 .hfill{position:absolute;left:0;top:0;right:0;bottom:0;z-index:0}
 /* 记录段实心块：每段一个独立 div，纯色、无渐变（取代旧的渐变背景） */
-.hrec{position:absolute;left:3px;right:3px;z-index:1;border-radius:7px;box-shadow:0 0 0 1px rgba(255,255,255,.55)}
+.hrec{position:absolute;left:0;right:0;z-index:1;border-radius:0}
 .hhour{position:relative;z-index:6;font-size:12.5px;color:var(--tx);font-weight:700;text-align:center;padding:5px 0 4px}
 .hblock.filled .hhour{font-weight:700;padding:2px 0;margin:3px auto 0}
 .hblock.night .hhour{color:var(--tx2)}
 .hday{display:none}   /* 胶囊不再显示 昨天/今天/明天 日期标签 */
 /* 计划块：与记录段同为「上下纵向」——用 top/height 定位，左右满宽内缩 3px */
-.hplan{position:absolute;left:3px;right:3px;z-index:2;border:1.5px dashed;border-radius:7px;box-sizing:border-box}
+.hplan{position:absolute;left:0;right:0;z-index:2;border:1.5px dashed;border-radius:0;box-sizing:border-box}
 /* 计划填充块不再渲染 .ph 文字，仅保留虚线+填充底色 */
 .tlhead{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--tx3);flex-wrap:wrap}
 .tlhead .tlinfo{font-weight:600;color:var(--tx2)}
@@ -321,8 +321,8 @@ display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(10,37,64,.22
 .wkaxis.today,.wkaxis.today:hover{box-shadow:0 0 0 2.5px var(--tx2)}
 .wkaxis.blank{background:var(--empn);border-style:dashed;border-color:var(--line2)}
 .wkaxis .wkfill{position:absolute;inset:0;z-index:0}
-.wkaxis .wkseg{position:absolute;left:1px;right:1px;z-index:0;border-radius:3px}
-.wkaxis .hplan{left:2px;right:2px;border-radius:6px}
+.wkaxis .wkseg{position:absolute;left:0;right:0;z-index:0;border-radius:0}
+.wkaxis .hplan{left:0;right:0;border-radius:0}
 .wkaxis .wknow{position:absolute;left:0;right:0;border-top:2px solid var(--acc);z-index:4}
 .wkfoot{text-align:center;line-height:1.25;padding-top:1px}
 .wkfoot b{display:block;font-size:13px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
