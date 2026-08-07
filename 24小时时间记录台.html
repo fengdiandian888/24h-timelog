@@ -440,12 +440,6 @@ backdrop-filter:none;box-shadow:0 -2px 10px rgba(10,37,64,.04)}
 .tmi:focus{border-color:var(--acc)}
 .dietrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:7px}
 
-/* 时间轴上的打卡标记：勾选饮食/运动后自动填充的纯色块（无文字） */
-.hseg{position:absolute;left:3px;right:3px;z-index:4;border-radius:5px;pointer-events:none;
-  box-shadow:0 0 0 1px rgba(255,255,255,.55)}
-/* 通勤：已记录但不计入自律 —— 实心浅灰块（和吃饭/运动同款实心样式，只换颜色区分） */
-.hseg.soft{background:rgba(126,140,161,.72)!important;color:#fff!important}
-
 @media(max-width:520px){
   .habitrow{gap:8px}
   .hbcard{padding:11px}
@@ -1057,6 +1051,7 @@ function delEvent(d,gid){
     if(victim.hab.indexOf('meal:')===0){ if(dd.meal&&dd.meal[victim.hab.slice(5)])delete dd.meal[victim.hab.slice(5)]; }
     else if(victim.hab==='train'){ if(dd.workout&&dd.workout.train)dd.workout.train.done=false; }
     else if(victim.hab.indexOf('walk:')===0){ if(dd.workout&&dd.workout.walk)delete dd.workout.walk[victim.hab.slice(5)]; }
+    else if(victim.hab.indexOf('commute:')===0){ if(dd.workout&&dd.workout.commute)delete dd.workout.commute[victim.hab.slice(8)]; }
   }
   dd.ev=dd.ev.filter(function(x){return x.gid!==gid && x.id!==gid;});
 }
@@ -1067,6 +1062,7 @@ function uncheckHabit(d,ev){
   if(tag.indexOf('meal:')===0){ if(dd.meal&&dd.meal[tag.slice(5)])delete dd.meal[tag.slice(5)]; }
   else if(tag==='train'){ if(dd.workout&&dd.workout.train)dd.workout.train.done=false; }
   else if(tag.indexOf('walk:')===0){ if(dd.workout&&dd.workout.walk)delete dd.workout.walk[tag.slice(5)]; }
+  else if(tag.indexOf('commute:')===0){ if(dd.workout&&dd.workout.commute)delete dd.workout.commute[tag.slice(8)]; }
 }
 /* 强制时间唯一：把 [s,e) 内与其它段重叠的部分让位（谁后保存谁压谁）。
    返回被整段删除的段数组（hab 段被压即整段删，调用方负责 uncheckHabit；手动段被压则裁掉重叠部分，完全覆盖才删）。 */
@@ -1118,12 +1114,19 @@ function syncHabitEvents(d){
     var t=(WALK_LB[i]||('步行'+(i+1)));
     if(!upd(tag,r.s,r.e,t))push({id:uid(),gid:uid(),hab:tag,cat:'4',s:r.s,e:r.e,t:t,plan:false});
   });
+  (S.cfg.workout.commute||[]).forEach(function(m,i){
+    var k=String(m), tag='commute:'+k;
+    if(!(wo.commute&&wo.commute[k]&&wo.commute[k].done))return;
+    var t='骑行通勤';
+    if(!upd(tag,m,m+COMM_DUR,t))push({id:uid(),gid:uid(),hab:tag,cat:'4',s:m,e:m+COMM_DUR,t:t,plan:false});
+  });
   var out=evs.filter(function(e){
     if(!e.hab)return true;
     var keep;
     if(e.hab.indexOf('meal:')===0)keep=!!(m[e.hab.slice(5)]&&m[e.hab.slice(5)].done);
     else if(e.hab==='train')keep=!!(wo.train&&wo.train.done);
     else if(e.hab.indexOf('walk:')===0)keep=!!(wo.walk&&wo.walk[e.hab.slice(5)]&&wo.walk[e.hab.slice(5)].done);
+    else if(e.hab.indexOf('commute:')===0)keep=!!(wo.commute&&wo.commute[e.hab.slice(8)]&&wo.commute[e.hab.slice(8)].done);
     else keep=true;
     if(!keep)changed=true;
     return keep;
@@ -1158,7 +1161,7 @@ function renderRec(){
   maybeFetchWeather();
   checkReminders();
   renderDayPlan();
-  renderMealCard();renderWorkoutCard();renderHabits();renderZilv();
+  renderMealCard();renderWorkoutCard();renderTimeline();renderZilv();
 }
 function applyDayLight(){
   document.getElementById('curDate').textContent=fullDate(curDate);
@@ -1257,7 +1260,6 @@ function renderTimeline(){
     h+='</div>';
   }
   el.innerHTML=h;
-  if(typeof renderHabits==='function')renderHabits();   /* 时间轴一重画，打卡标记就跟着重画 */
 }
 function tapCapsule(d,hour){
   /* 点胶囊一律进入「新建一段」：默认时间由 firstFreeStart 自动定位到该小时空闲处，不顶替已有记录；
@@ -2375,9 +2377,6 @@ function walkRange(x){
 var HB_SPORT='#71BF50';  /* 运动标记色（= 运动分类色） */
 var HB_SPORT_BAR='#71BF50'; /* 进度条（运动卡用，= HB_SPORT 运动时间轴标记同源色，与饮食绿有意区分） */
 var HB_OK='#1FA971';     /* 自律达标绿 */
-/* 通勤 = 记了但不计入自律 → 不给实心绿，用次级文字色 #425466 的半透明空心环 + 弱化标签 */
-var HB_MUTE='rgba(66,84,102,.55)';    /* 通勤圆点：描边环色 */
-var HB_MUTE_TX='rgba(66,84,102,.85)'; /* 通勤微标签：文字色 */
 
 /* 七天默认食谱，逐日独立（来源：健身指南_每日方案.html）。
    每天固定「早 / 午 / 晚」三餐，不含加餐、练前、练后、补脂、补剂。
@@ -2741,6 +2740,13 @@ function toggleCommute(d,min){
   var dd=ensureHabitDay(d), k=String(min);
   if(!dd.workout.commute[k])dd.workout.commute[k]={done:false};
   dd.workout.commute[k].done=!dd.workout.commute[k].done;
+  var tag='commute:'+k;
+  if(dd.workout.commute[k].done){
+    carveSegments(d,+k,+k+COMM_DUR,null).forEach(function(ev){uncheckHabit(d,ev);});
+    putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:+k,e:+k+COMM_DUR,t:'骑行通勤',plan:false});
+  }else{
+    rmHabEv(d,tag);
+  }
   save();afterHabitChange();
 }
 /* 去程 + 回程一起切：两个都打过 → 全部取消，否则全部打上。save/刷新各只调一次 */
@@ -2754,44 +2760,18 @@ function toggleCommuteAll(d){
   ks.forEach(function(k){
     if(!dd.workout.commute[k])dd.workout.commute[k]={done:false};
     dd.workout.commute[k].done=next;
+    var tag='commute:'+k, min=+k;
+    if(next){
+      carveSegments(d,min,min+COMM_DUR,null).forEach(function(ev){uncheckHabit(d,ev);});
+      putHabEv(d,{id:uid(),gid:uid(),hab:tag,cat:'4',s:min,e:min+COMM_DUR,t:'骑行通勤',plan:false});
+    }else{
+      rmHabEv(d,tag);
+    }
   });
   save();afterHabitChange();
 }
 
-/* ==================== 时间轴打卡标记 ====================
-   饮食(早/午/晚)/训练/步行 勾选后已生成真实事件记录段（renderTimeline 直接渲染，无需此处画块）；
-   这里只补画「通勤」——它保留打卡形式、不计自律、不生成事件，用浅灰虚线块区分。 */
-function renderHabits(){
-  var wrap=document.getElementById('timeline'); if(!wrap)return;
-  ensureHabitCfg();
-  var blocks=wrap.querySelectorAll('.hblock');
-  var i,j,old;
-  for(i=0;i<blocks.length;i++){
-    old=blocks[i].querySelectorAll('.hseg');
-    for(j=0;j<old.length;j++)old[j].parentNode.removeChild(old[j]);
-  }
-  var cache={};
-  function commSegs(d){
-    if(cache[d])return cache[d];
-    var out=[], wo=habRead(d).wo, cfg=S.cfg.workout;
-    (cfg.commute||[]).forEach(function(m){
-      var k=String(m);
-      if(wo.commute&&wo.commute[k]&&wo.commute[k].done)out.push({s:m,e:m+COMM_DUR});
-    });
-    cache[d]=out; return out;
-  }
-  for(i=0;i<blocks.length;i++){
-    var b=blocks[i], d=b.getAttribute('data-d'), hh=+b.getAttribute('data-h');
-    if(!d||isNaN(hh))continue;
-    var s0=hh*60, s1=s0+60, h='';
-    commSegs(d).forEach(function(seg){
-      var a=Math.max(seg.s,s0), c=Math.min(seg.e,s1);
-      if(c<=a)return;
-      h+='<div class="hseg soft" style="top:'+((a-s0)/60*100).toFixed(2)+'%;height:'+Math.max(10,((c-a)/60*100)).toFixed(2)+'%"></div>';
-    });
-    if(h)b.insertAdjacentHTML('beforeend',h);
-  }
-}
+/* 通勤已改为生成真实事件（运动分类）→ 由 renderTimeline 直接渲染，无需补画标记块 */
 
 /* ==================== 自律 ====================
    达标 = 当天饮食每顿都✓  且  训练✓（周日无训练则免）  且  cfg 里的步行全部✓
@@ -2924,8 +2904,8 @@ function migrateWoKey(kind,oldMin,newMin){
     if(box[ok]){box[nk]={done:!!box[ok].done};delete box[ok];}
   });
 }
-/* 改完步行时间后：同步今天/昨天的事件（删旧键残留段、按新键补建），防止"删了又有/旧段残留" */
-function syncWalkEvents(){
+/* 改完运动时间（步行/通勤）后：同步今天/昨天的事件（删旧键残留段、按新键补建），防止"删了又有/旧段残留" */
+function syncHabEvents(){
   [todayStr(),addD(todayStr(),-1)].forEach(function(d){
     if(S.days[d]&&syncHabitEvents(d))save();
   });
@@ -2936,9 +2916,9 @@ function setWoCfg(field,idx,v){
   var c=S.cfg.workout;
   if(field==='trainStart'){c.trainStart=m;if(c.trainEnd<=c.trainStart)c.trainEnd=c.trainStart+60;}
   else if(field==='trainEnd'){c.trainEnd=(m<=c.trainStart?c.trainStart+30:m);}
-  else if(field==='walks'){var oldR=walkRange(c.walks[idx]);migrateWoKey('walk',oldR.s,m);c.walks[idx]={s:m,e:(oldR.e>m?oldR.e:m+30)};syncWalkEvents();}
-  else if(field==='walkE'){var r=walkRange(c.walks[idx]);c.walks[idx]={s:r.s,e:(m<=r.s?r.s+30:m)};syncWalkEvents();}
-  else if(field==='commute'){migrateWoKey('commute',c.commute[idx],m);c.commute[idx]=m;}
+  else if(field==='walks'){var oldR=walkRange(c.walks[idx]);migrateWoKey('walk',oldR.s,m);c.walks[idx]={s:m,e:(oldR.e>m?oldR.e:m+30)};syncHabEvents();}
+  else if(field==='walkE'){var r=walkRange(c.walks[idx]);c.walks[idx]={s:r.s,e:(m<=r.s?r.s+30:m)};syncHabEvents();}
+  else if(field==='commute'){migrateWoKey('commute',c.commute[idx],m);c.commute[idx]=m;syncHabEvents();}
   save();renderHabitSettings();renderRec();
 }
 function resetHabitDefaults(){
